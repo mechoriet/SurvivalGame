@@ -1,0 +1,62 @@
+name: SurvivalGames
+version: 1.0
+author: rfsantos1996
+main: com.jabyftw.sgames.SurvivalGames
+description: Alternative SurvivalGames minigame plugin
+softdepend: [Vault,PlayerPoints]
+commands:
+   sg:
+     description: Main player command
+     usage: Use /sg (ranking/stats/leave/join/spectate/sponsor/list/vote)
+   sgm:
+     description: Main management command
+     usage: Use /sgm (start/stop/kick)
+   sgs:
+     description: Main setup command
+     usage: Check SurvivalGameAlternative's Bukkit website to setup an arena.
+permissions:
+   survivalgames.join:
+     description: Allows you to join a lobby
+     default: true
+   survivalgames.vote:
+     description: Allows you to vote a lobby
+     default: true
+   survivalgames.spectate:
+     description: Allows you to spectate players
+     default: true
+   survivalgames.stats:
+     description: Allows you to see your own stats
+     default: true
+   survivalgames.sponsor:
+     description: Allows you to sponsor players
+     default: true
+   survivalgames.ranking:
+     description: Allows you to see the top x ranking
+     default: true
+   survivalgames.breakallblocks:
+     description: Allows you to break any kind of block
+     default: op
+   survivalgames.placeallblocks:
+     description: Allows you to place any kind of block
+     default: op
+   survivalgames.useanycommand:
+     description: Allows you to use any command
+     default: op
+   survivalgames.joinfulllobby:
+     description: Allows you to join a full lobby
+     default: op
+   survivalgames.editsigns:
+     description: Allows you to edit lobby's signs
+     default: op
+   survivalgames.management.stoplobby:
+     description: Allows you to stop lobbies that are playing
+     default: op
+   survivalgames.management.startlobby:
+     description: Allows you to start lobbies that are waiting
+     default: op
+   survivalgames.management.kick:
+     description: Allows you to kick players from any lobby
+     default: op
+   survivalgames.setup.all:
+     description: Allows you to setup an arena/lobby
+     default: op
