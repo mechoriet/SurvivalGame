@@ -490,6 +490,7 @@ public class Lobby {
         }
         if(players.containsKey(p)) {
             Jogador j = players.get(p);
+            j.getScoreboardManager().stopRunnable(true);
             if(j.isPlaying()) {
                 dropInventory(p);
                 j.setPlaying(false);
@@ -814,9 +815,9 @@ public class Lobby {
         return spectators.get(player);
     }
 
-    public String getAliveSize() {
+    public String getAliveNonMutattorSize() {
         if(state == State.PLAYING || state == State.DEATHMATCH) {
-            return Integer.toString(getAliveJogador().size());
+            return Integer.toString(getAliveNonMuttatorPlayers().size());
         } else {
             return Integer.toString(preplayers.size());
         }

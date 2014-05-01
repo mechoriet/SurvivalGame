@@ -35,16 +35,16 @@ permissions:
      default: true
    survivalgames.breakallblocks:
      description: Allows you to break any kind of block
-     default: op
+     default: false
    survivalgames.placeallblocks:
      description: Allows you to place any kind of block
-     default: op
+     default: false
    survivalgames.useanycommand:
      description: Allows you to use any command
      default: op
    survivalgames.joinfulllobby:
      description: Allows you to join a full lobby
-     default: op
+     default: false
    survivalgames.editsigns:
      description: Allows you to edit lobby's signs
      default: op

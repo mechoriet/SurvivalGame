@@ -21,7 +21,7 @@ public class GameSetup {
     private int minPlayer = 0, maxPlayer = 0, lightningThreshold = 0, chestRefresh = 0, maxDuration = 0, graceTime = 45, waitTime = 30,
             withEnough = 2, withoutEnough = 3, possibleJoinsDelay = 30;
     private String votingDescription = "", displayName = "",
-            corner1 = "", corner2 = "", spectator = "", lobbyLocation = "", exitLocation = ""; // Locations
+            corner1 = "", corner2 = "", spectator = "", safeLocation = "", exitLocation = ""; // Locations
     private boolean kickVips = false, searchForChests = true;
     private int deathmatchDuration = 0, deathmatchDistance = 0; // DEATHMATCH
     private String deathmatchCenter = ""; // DEATHMATCH
@@ -53,7 +53,7 @@ public class GameSetup {
         corner1 = pl.config.locationToString(lobby.getArena().getCorner1());
         corner2 = pl.config.locationToString(lobby.getArena().getCorner2());
         spectator = pl.config.locationToString(lobby.getArena().getSpectatorSpawn());
-        lobbyLocation = pl.config.locationToString(lobby.getArena().getSafeLocation());
+        safeLocation = pl.config.locationToString(lobby.getArena().getSafeLocation());
         kickVips = lobby.getKickVips();
         exitLocation = pl.config.locationToString(lobby.getArena().getExitLocation());
         searchForChests = lobby.getArena().searchChests();
@@ -112,8 +112,8 @@ public class GameSetup {
         if(spectator.length() == 0) {
             error.add(pl.getLang("setup.error.spectatorNotSet"));
         }
-        if(lobbyLocation.length() == 0) {
-            error.add(pl.getLang("setup.error.lobbyLocationNotSet"));
+        if(safeLocation.length() == 0) {
+            error.add(pl.getLang("setup.error.safeLocationNotSet"));
         }
         if(exitLocation.length() == 0) {
             error.add(pl.getLang("setup.error.exitLocationNotSet"));
@@ -390,16 +390,16 @@ public class GameSetup {
         this.displayName = displayName.replaceAll("&", "§");
     }
 
-    public String getLobbyLocation() {
-        return lobbyLocation;
+    public String getSafeLocation() {
+        return safeLocation;
     }
 
     public String getExitLocation() {
         return exitLocation;
     }
 
-    public void setLobbyLocation(Location lobbyLocation) {
-        this.lobbyLocation = pl.config.locationToString(lobbyLocation);
+    public void setSafeLocation(Location location) {
+        this.safeLocation = pl.config.locationToString(location);
     }
 
     public void setExitLocation(Location location) {

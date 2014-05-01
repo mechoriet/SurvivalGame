@@ -17,10 +17,8 @@ import java.util.Map;
 public class Jogador extends Spectator {
 
     private final SurvivalGames pl;
-    private final Player player;
     private final RankingEntry rankingEntry;
     private final Kit kit;
-    private final Lobby lobby;
     private final ScoreboardManager scoreboardManager;
 
     private final ArrayList<String> sponsors = new ArrayList<String>();
@@ -30,11 +28,9 @@ public class Jogador extends Spectator {
     public Jogador(SurvivalGames pl, Player p, Lobby lobby, RankingEntry ranking, Kit kit) {
         super(p, lobby);
         this.pl = pl;
-        this.player = p;
         this.rankingEntry = ranking;
-        this.lobby = lobby;
         this.kit = kit;
-        scoreboardManager = new ScoreboardManager(pl, player, pl.config.scoreboardDelay, pl.config.getReplacer(lobby));
+        scoreboardManager = new ScoreboardManager(pl, this, pl.config.scoreboardDelay, pl.config.getReplacer(lobby, this));
     }
 
     public ScoreboardManager getScoreboardManager() {

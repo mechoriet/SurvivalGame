@@ -109,7 +109,7 @@ public class SurvivalGames extends JavaPlugin {
     }
 
     public String getLang(String path) {
-        return config.langY.getConfig().getString("lang." + path).replaceAll("&", "§");
+        return config.langPrefix + config.langY.getConfig().getString("lang." + path).replaceAll("&", "§");
     }
 
     public double getRandom(int min, int max) {
@@ -130,6 +130,7 @@ public class SurvivalGames extends JavaPlugin {
         p.resetPlayerWeather();
         p.getInventory().clear();
         p.getInventory().setArmorContents(null);
+        p.setScoreboard(getServer().getScoreboardManager().getMainScoreboard());
         //noinspection deprecation
         p.updateInventory();
     }

@@ -33,7 +33,7 @@ public class SGExecutor implements CommandExecutor {
                                 .replaceAll("%path", set.getKey())
                                 .replaceAll("%displayname", set.getValue().getName())
                                 .replaceAll("%state", pl.getStateName(set.getValue().getCurrentState()))
-                                .replaceAll("%alive", set.getValue().getAliveSize())
+                                .replaceAll("%alive", set.getValue().getAliveNonMutattorSize())
                                 .replaceAll("%time", set.getValue().getDurationRemaining())
                                 .replaceAll("%min", Integer.toString(set.getValue().getMinPlayers()))
                                 .replaceAll("%max", Integer.toString(set.getValue().getMaxPlayers())));

@@ -158,8 +158,8 @@ public class SGSExecutor implements CommandExecutor {
                                 gameSetups.get(player).setSpectator(player.getLocation());
                                 player.sendMessage(pl.getLang("setup.successful.location"));
                                 return true;
-                            } else if(args[0].equalsIgnoreCase("LobbyLocation")) {
-                                gameSetups.get(player).setLobbyLocation(player.getLocation());
+                            } else if(args[0].equalsIgnoreCase("SafeLocation")) {
+                                gameSetups.get(player).setSafeLocation(player.getLocation());
                                 player.sendMessage(pl.getLang("setup.successful.location"));
                                 return true;
                             } else if(args[0].equalsIgnoreCase("ExitLocation")) {

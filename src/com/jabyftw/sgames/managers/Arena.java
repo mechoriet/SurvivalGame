@@ -25,7 +25,7 @@ public class Arena {
     private final boolean searchForChests;
     private final ArrayList<Material> allowPlace = new ArrayList<Material>(), allowBreak = new ArrayList<Material>(), blockedCrafting = new ArrayList<Material>();
     private final LinkedHashMap<Location, Boolean> Spawns = new LinkedHashMap<Location, Boolean>(), deathmatchSpawns = new LinkedHashMap<Location, Boolean>();
-    private final Location spectatorSpawn, center, corner1, corner2, lobbyLocation, exitLocation;
+    private final Location spectatorSpawn, center, corner1, corner2, safeLocation, exitLocation;
 
     private final LinkedHashMap<Location, Material> changedBlocks = new LinkedHashMap<Location, Material>();
     private final HashMap<Location, String> chestLocation = new HashMap<Location, String>();
@@ -42,7 +42,7 @@ public class Arena {
                  HashMap<Location, String> chestlocation,
                  ArrayList<Material> allowplace, ArrayList<Material> allowbreak, ArrayList<Material> blockedcrafting,
                  ArrayList<Location> spawns, ArrayList<Location> dmspawns,
-                 Location spectator, Location center, Location corner1, Location corner2, Location lobbylocation, Location exitlocation) {
+                 Location spectator, Location center, Location corner1, Location corner2, Location safelocation, Location exitlocation) {
         this.pl = pl;
         this.searchForChests = searchforchests;
         this.useDeathmatch = usedeathmatch;
@@ -75,7 +75,7 @@ public class Arena {
         this.center = center;
         this.corner1 = corner1;
         this.corner2 = corner2;
-        this.lobbyLocation = lobbylocation;
+        this.safeLocation = safelocation;
         this.exitLocation = exitlocation;
         searchChunks();
         validChests(chestlocation.entrySet());
@@ -86,7 +86,7 @@ public class Arena {
                  HashMap<Location, String> chestlocation,
                  ArrayList<Material> allowplace, ArrayList<Material> allowbreak, ArrayList<Material> blockedcrafting,
                  ArrayList<Location> spawns,
-                 Location spectator, Location corner1, Location corner2, Location lobbylocation, Location exitlocation) {
+                 Location spectator, Location corner1, Location corner2, Location safelocation, Location exitlocation) {
         this.pl = pl;
         this.searchForChests = searchforchests;
         this.useDeathmatch = usedeathmatch;
@@ -114,14 +114,14 @@ public class Arena {
         this.center = null;
         this.corner1 = corner1;
         this.corner2 = corner2;
-        this.lobbyLocation = lobbylocation;
+        this.safeLocation = safelocation;
         this.exitLocation = exitlocation;
         searchChunks();
         validChests(chestlocation.entrySet());
     }
 
     public Location getSafeLocation() {
-        return lobbyLocation;
+        return safeLocation;
     }
 
     public Location getExitLocation() {
@@ -198,7 +198,7 @@ public class Arena {
     }
 
     public boolean checkVariables() {
-        if(spectatorSpawn != null && spectatorSpawn.getWorld() != null && corner1 != null && lobbyLocation != null && lobbyLocation.getWorld() != null && corner1.getWorld() != null && corner2 != null && corner2.getWorld() != null) {
+        if(spectatorSpawn != null && spectatorSpawn.getWorld() != null && corner1 != null && safeLocation != null && safeLocation.getWorld() != null && corner1.getWorld() != null && corner2 != null && corner2.getWorld() != null) {
             if(center != null && center.getWorld() != null && deathmatchSpawns.size() > 0) {
                 return true;
             }

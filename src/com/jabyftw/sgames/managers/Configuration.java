@@ -1,5 +1,6 @@
 package com.jabyftw.sgames.managers;
 
+import com.jabyftw.sgames.Jogador;
 import com.jabyftw.sgames.SurvivalGames;
 import com.jabyftw.sgames.SurvivalGames.State;
 import com.jabyftw.sgames.commands.GameSetup;
@@ -60,7 +61,7 @@ public final class Configuration {
     public Material spectatorPlayerSelector, spectatorPlayerSponsor, spectatorMuttation, playerSearcher, playerCrate;
 
     public boolean useVault, usePlayerPoints, useMySQL, useVoting, useAutojoin, useSponsor, tntAutoIgnite, useMuttation, tntUseFakeExplosion, useChat, announceCrateDeploy, playCrateFirework, blockDropItem;
-    public String waitingString, pregameString, playingString, deathmatchString, disabledString, chatFormat, crateAnnouncement, crateInventoryTitle;
+    public String waitingString, pregameString, playingString, deathmatchString, disabledString, chatFormat, crateAnnouncement, crateInventoryTitle, langPrefix;
     public int valuePerWin, valuePerKill, guiUpdateDelay, tntPower, tntDelay, maxDistance, signDelay, rankingEntries, muttationCost, muttationBonus, muttationReward, scoreboardDelay;
     public String[] signLines = new String[4];
 
@@ -262,7 +263,7 @@ public final class Configuration {
         lang.addDefault("lang.setup.error.corner1NotSet", "&cFirst corner&f");
         lang.addDefault("lang.setup.error.corner2NotSet", "&cSecond corner&f");
         lang.addDefault("lang.setup.error.spectatorNotSet", "&cSpectator spawn&f");
-        lang.addDefault("lang.setup.error.lobbyLocationNotSet", "&cLobby location&f");
+        lang.addDefault("lang.setup.error.safeLocationNotSet", "&cSafe location&f");
         lang.addDefault("lang.setup.error.exitLocationNotSet", "&cExit location&f");
         lang.addDefault("lang.setup.error.chestDelayNotSet", "&eChest delay&f");
         lang.addDefault("lang.setup.error.votingDescriptionNotSet", "&aVoting description&f");
@@ -270,6 +271,8 @@ public final class Configuration {
         lang.addDefault("lang.setup.error.deathmatchDistanceRadiusNotSet", "&eDeathmatch kill radius threshold&f");
         lang.addDefault("lang.setup.error.deathmatchCenterNotSet", "&cDeathmatch center&f");
         lang.addDefault("lang.setup.error.deathmatchSpawnNotSet", "&cDeathmatch spawns&f");
+        lang.addDefault("lang.prefix", "&c[&6SurvivalGames&c]&a ");
+        langPrefix = lang.getString("lang.prefix").replaceAll("&", "§");
         langY.saveConfig();
     }
 
@@ -1464,7 +1467,7 @@ public final class Configuration {
             lobbies.addDefault("lobbies." + setup.getPath() + ".firstCornerLocation", setup.getCorner1());
             lobbies.addDefault("lobbies." + setup.getPath() + ".secondCornerLocation", setup.getCorner2());
             lobbies.addDefault("lobbies." + setup.getPath() + ".spectatorSpawnLocation", setup.getSpectator());
-            lobbies.addDefault("lobbies." + setup.getPath() + ".lobbyLocation", setup.getLobbyLocation());
+            lobbies.addDefault("lobbies." + setup.getPath() + ".lobbyLocation", setup.getSafeLocation());
             lobbies.addDefault("lobbies." + setup.getPath() + ".exitLocation", setup.getExitLocation());
             lobbies.addDefault("lobbies." + setup.getPath() + ".itemsBlockedFromCrafting", setup.getBlockCrafting());
             lobbies.addDefault("lobbies." + setup.getPath() + ".blocksAllowedToPlace", setup.getAllowPlace());
@@ -1501,7 +1504,7 @@ public final class Configuration {
             lobbies.set("lobbies." + setup.getPath() + ".firstCornerLocation", setup.getCorner1());
             lobbies.set("lobbies." + setup.getPath() + ".secondCornerLocation", setup.getCorner2());
             lobbies.set("lobbies." + setup.getPath() + ".spectatorSpawnLocation", setup.getSpectator());
-            lobbies.set("lobbies." + setup.getPath() + ".lobbyLocation", setup.getLobbyLocation());
+            lobbies.set("lobbies." + setup.getPath() + ".lobbyLocation", setup.getSafeLocation());
             lobbies.set("lobbies." + setup.getPath() + ".exitLocation", setup.getExitLocation());
             lobbies.set("lobbies." + setup.getPath() + ".itemsBlockedFromCrafting", setup.getBlockCrafting());
             lobbies.set("lobbies." + setup.getPath() + ".blocksAllowedToPlace", setup.getAllowPlace());
@@ -1562,18 +1565,50 @@ public final class Configuration {
 
     private void generateScoreboardConfig() {
         FileConfiguration scoreboards = scoreboardY.getConfig();
+        String[] waiting = {"&6Players: &a%alive/%min", "blank", "&cMax duration: &4%maxdurationm", "blank", "&4K/D: &c%kdratio", "&4W/L: &c%wlratio", "&aPoints: &e%points"},
+                pregame = {"&6Players: &a%alive/%max", "blank", "&cKit: &6%kitname", "blank", "&4K/D: &c%kdratio", "&4W/L: &c%wlratio", "&aPoints: &e%points"},
+                playing = {"&6Players: &a%alive/%max", "blank", "&cKit: &6%kitname", "blank", "&4K/D: &c%kdratio", "&4W/L: &c%wlratio", "&aPoints: &e%points", "&cIs alive? &a%isalive"},
+                deathmatch = {"&4K/D: &c%kdratio", "&4W/L: &c%wlratio", "&aPoints: &e%points", "&cIs alive? &a%isalive"};
+        scoreboards.addDefault("scoreboards." + State.WAITING.toString().toLowerCase() + ".title", "&cWaiting...");
+        scoreboards.addDefault("scoreboards." + State.WAITING.toString().toLowerCase() + ".lines", Arrays.asList(waiting));
+        scoreboards.addDefault("scoreboards." + State.PREGAME.toString().toLowerCase() + ".title", "&cWait %waiting sec");
+        scoreboards.addDefault("scoreboards." + State.PREGAME.toString().toLowerCase() + ".lines", Arrays.asList(pregame));
+        scoreboards.addDefault("scoreboards." + State.PLAYING.toString().toLowerCase() + ".title", "&c%duration min");
+        scoreboards.addDefault("scoreboards." + State.PLAYING.toString().toLowerCase() + ".lines", Arrays.asList(playing));
+        scoreboards.addDefault("scoreboards." + State.DEATHMATCH.toString().toLowerCase() + ".title", "&c%duration min");
+        scoreboards.addDefault("scoreboards." + State.DEATHMATCH.toString().toLowerCase() + ".lines", Arrays.asList(deathmatch));
+        scoreboards.addDefault("scoreboards." + State.DISABLED.toString().toLowerCase() + ".title", "&4Disabled");
+        scoreboards.addDefault("scoreboards." + State.DISABLED.toString().toLowerCase() + ".lines", Arrays.asList(empty));
         scoreboardY.saveConfig();
     }
 
-    public ScoreboardManager.Replacer getReplacer(Lobby lobby) {
-        return null;
+    public ScoreboardManager.Replacer getReplacer(final Lobby lobby, final Jogador jogador) {
+        return new ScoreboardManager.Replacer() {
+            @Override
+            public String replaceString(String message) {
+                return message
+                        .replaceAll("%isalive", Boolean.valueOf(jogador.isPlaying()).toString().toLowerCase())
+                        .replaceAll("%kitname", jogador.getKit().getName())
+                        .replaceAll("%kdratio", jogador.getRanking().getKillDeathRatio())
+                        .replaceAll("%wlratio", jogador.getRanking().getWinLosRatio())
+                        .replaceAll("%points", jogador.getRanking().getPoints())
+                        .replaceAll("%maxduration", Integer.toString(lobby.getMaxDuration()))
+                        .replaceAll("%duration", lobby.getDurationRemaining())
+                        .replaceAll("%alive", lobby.getAliveNonMutattorSize())
+                        .replaceAll("%max", Integer.toString(lobby.getMaxPlayers()))
+                        .replaceAll("%min", Integer.toString(lobby.getMinPlayers()))
+                        .replaceAll("%waiting", Integer.toString(lobby.getWaitTime()))
+                        .replaceAll("&", "§");
+            }
+        };
     }
 
     public String getScoreboardTitle(State state) {
-        return null;
+        return scoreboardY.getConfig().getString("scoreboards." + state.toString().toLowerCase() + ".title");
     }
 
     public String[] getScoreboardLines(State state) {
-        return null;
+        List<String> list = scoreboardY.getConfig().getStringList("scoreboards." + state.toString().toLowerCase() + ".lines");
+        return list.toArray(new String[list.size()]);
     }
 }

@@ -10,8 +10,8 @@ import java.util.ArrayList;
  */
 public class Spectator {
 
-    private final Player player;
-    private final Lobby lobby;
+    protected final Player player;
+    protected final Lobby lobby;
 
     private int value = 0;
 
