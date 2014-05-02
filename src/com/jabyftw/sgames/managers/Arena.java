@@ -32,7 +32,6 @@ public class Arena {
     private final ArrayList<SupplyCrate> cratesDropped = new ArrayList<SupplyCrate>();
     private final ArrayList<Location2D> cratesUsed = new ArrayList<Location2D>();
     private final ArrayList<Chunk> lobbyChunks = new ArrayList<Chunk>();
-
     private final ArrayList<Entity> entitiesToRemove = new ArrayList<Entity>();
 
     private boolean useDeathmatch;

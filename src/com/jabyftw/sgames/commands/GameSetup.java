@@ -92,53 +92,53 @@ public class GameSetup {
     public ArrayList<String> getMissedConfig() {
         ArrayList<String> error = new ArrayList<String>();
         if(spawnLocation.size() < minPlayer) {
-            error.add(pl.getLang("setup.error.notEnoughSpawns"));
+            error.add(pl.getNoPrefixLang("setup.error.notEnoughSpawns"));
         }
         if(minPlayer == 0) {
-            error.add(pl.getLang("setup.error.minPlayerNotSet"));
+            error.add(pl.getNoPrefixLang("setup.error.minPlayerNotSet"));
         }
         if(maxPlayer == 0) {
-            error.add(pl.getLang("setup.error.maxPlayerNotSet"));
+            error.add(pl.getNoPrefixLang("setup.error.maxPlayerNotSet"));
         }
         if(maxDuration == 0) {
-            error.add(pl.getLang("setup.error.maxDurationNotSet"));
+            error.add(pl.getNoPrefixLang("setup.error.maxDurationNotSet"));
         }
         if(corner1.length() == 0) {
-            error.add(pl.getLang("setup.error.corner1NotSet"));
+            error.add(pl.getNoPrefixLang("setup.error.corner1NotSet"));
         }
         if(corner2.length() == 0) {
-            error.add(pl.getLang("setup.error.corner2NotSet"));
+            error.add(pl.getNoPrefixLang("setup.error.corner2NotSet"));
         }
         if(spectator.length() == 0) {
-            error.add(pl.getLang("setup.error.spectatorNotSet"));
+            error.add(pl.getNoPrefixLang("setup.error.spectatorNotSet"));
         }
         if(safeLocation.length() == 0) {
-            error.add(pl.getLang("setup.error.safeLocationNotSet"));
+            error.add(pl.getNoPrefixLang("setup.error.safeLocationNotSet"));
         }
         if(exitLocation.length() == 0) {
-            error.add(pl.getLang("setup.error.exitLocationNotSet"));
+            error.add(pl.getNoPrefixLang("setup.error.exitLocationNotSet"));
         }
         if(displayName.length() == 0) {
-            error.add(pl.getLang("setup.error.displayNameNotSet"));
+            error.add(pl.getNoPrefixLang("setup.error.displayNameNotSet"));
         }
         if(chestLocation.size() > 0 && chestRefresh == 0) {
-            error.add(pl.getLang("setup.error.chestDelayNotSet"));
+            error.add(pl.getNoPrefixLang("setup.error.chestDelayNotSet"));
         }
         if(pl.config.useVoting && votingDescription.length() == 0) {
-            error.add(pl.getLang("setup.error.votingDescriptionNotSet"));
+            error.add(pl.getNoPrefixLang("setup.error.votingDescriptionNotSet"));
         }
         if((deathmatchDuration != 0 || deathmatchDistance != 0 || deathmatchCenter.length() > 0 || deathmatchLocation.size() > 0) && !isDeathmatchEnabled()) {
             if(deathmatchDuration == 0) {
-                error.add(pl.getLang("setup.error.deathmatchDurationNotSet"));
+                error.add(pl.getNoPrefixLang("setup.error.deathmatchDurationNotSet"));
             }
             if(deathmatchDistance == 0) {
-                error.add(pl.getLang("setup.error.deathmatchDistanceRadiusNotSet"));
+                error.add(pl.getNoPrefixLang("setup.error.deathmatchDistanceRadiusNotSet"));
             }
             if(deathmatchCenter.length() == 0) {
-                error.add(pl.getLang("setup.error.deathmatchCenterNotSet"));
+                error.add(pl.getNoPrefixLang("setup.error.deathmatchCenterNotSet"));
             }
             if(deathmatchLocation.size() == 0) {
-                error.add(pl.getLang("setup.error.deathmatchSpawnNotSet"));
+                error.add(pl.getNoPrefixLang("setup.error.deathmatchSpawnNotSet"));
             }
         }
         return error;

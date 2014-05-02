@@ -1,6 +1,5 @@
 package com.jabyftw.sgames.util;
 
-import com.google.common.base.Splitter;
 import com.jabyftw.sgames.Jogador;
 import com.jabyftw.sgames.SurvivalGames;
 import org.bukkit.Bukkit;
@@ -15,7 +14,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Based on http://forums.bukkit.org/threads/util-simplescoreboard-make-pretty-scoreboards-with-ease.263041/
@@ -31,10 +32,10 @@ public class ScoreboardManager implements Listener {
     private final Objective objective = scoreboard.registerNewObjective("survivalgames", "dummy");
 
     private final HashMap<String, Integer> line = new HashMap<String, Integer>();
-    private final ArrayList<Team> teams = new ArrayList<Team>();
     private final ArrayList<Score> scorelist = new ArrayList<Score>();
 
     private BukkitTask runnable = null;
+    private boolean resetScoreboard = true;
 
     public ScoreboardManager(SurvivalGames pl, Jogador jogador, int delay, Replacer replacer) {
         this.pl = pl;
@@ -56,27 +57,13 @@ public class ScoreboardManager implements Listener {
     }
 
     private String fixDuplicates(String text) {
-        if(line.containsKey(text)) {
+        while(line.containsKey(text)) {
             text += "§r";
         }
-        if(text.length() > 48) {
-            text = text.substring(0, 47);
+        if(text.length() > 16) {
+            text = text.substring(0, 15);
         }
         return text;
-    }
-
-    private Map.Entry<Team, String> createTeam(String text) {
-        String result = "";
-        if(text.length() <= 16)
-            return new AbstractMap.SimpleEntry<Team, String>(null, text);
-        Team team = scoreboard.registerNewTeam("text-" + scoreboard.getTeams().size());
-        Iterator<String> iterator = Splitter.fixedLength(16).split(text).iterator();
-        team.setPrefix(iterator.next());
-        result = iterator.next();
-        if(text.length() > 32)
-            team.setSuffix(iterator.next());
-        teams.add(team);
-        return new AbstractMap.SimpleEntry<Team, String>(team, result);
     }
 
     public void startRunnable() {
@@ -85,6 +72,9 @@ public class ScoreboardManager implements Listener {
 
             @Override
             public void run() {
+                if(resetScoreboard && !jogador.getPlayer().getScoreboard().equals(scoreboard)) {
+                    jogador.getPlayer().setScoreboard(scoreboard);
+                }
                 for(Map.Entry<String, Integer> entry : line.entrySet()) {
                     for(Score oldscore : scorelist) {
                         if(oldscore != null) {
@@ -92,17 +82,15 @@ public class ScoreboardManager implements Listener {
                         }
                     }
                     scorelist.clear();
-                    Map.Entry<Team, String> team = createTeam(replacer.replaceString(entry.getKey()));
-                    OfflinePlayer player = Bukkit.getOfflinePlayer(team.getValue());
-                    if(team.getKey() != null) {
-                        team.getKey().addPlayer(player);
-                    }
+                    OfflinePlayer player = Bukkit.getOfflinePlayer(replacer.replaceString(entry.getKey()));
                     Score newscore = objective.getScore(player);
                     newscore.setScore(entry.getValue());
+                    /*Score newscore = objective.getScore(replacer.replaceString(entry.getKey()));
+                    newscore.setScore(entry.getValue());*/
                     scorelist.add(newscore);
                 }
             }
-        }.runTaskTimer(pl, 0, delay);
+        }.runTaskTimer(pl, 1, delay);
     }
 
     public void stopRunnable(boolean removeScoreboard) {
@@ -129,9 +117,7 @@ public class ScoreboardManager implements Listener {
         if(quitter.equals(jogador.getPlayer())) {
             stopRunnable(true);
             HandlerList.unregisterAll(this);
-            for(Team team : teams) {
-                team.unregister();
-            }
+            resetScoreboard = false;
         }
     }
 
