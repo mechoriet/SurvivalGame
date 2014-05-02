@@ -9,6 +9,7 @@ import com.jabyftw.sgames.item.SponsorKit;
 import com.jabyftw.sgames.util.IconMenu;
 import com.jabyftw.sgames.util.IconMenu.IconMenuEventHandler;
 import com.jabyftw.sgames.util.RankingEntry;
+import me.confuser.barapi.BarAPI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -86,6 +87,7 @@ public class Lobby {
             prepareAllPlayers();
             updatePlayersScoreboards();
             broadcastMessage(pl.getLang("startedInXSeconds").replaceAll("%time", Integer.toString(waitTime)));
+            setBar(players.keySet(), pl.getLang("barapi.startingInXSeconds"), waitTime * 20);
             new BukkitRunnable() {
 
                 @Override
@@ -102,6 +104,7 @@ public class Lobby {
                         broadcastMessage(pl.getLang("gameIsntWorth"));
                     }
                     updatePlayersScoreboards();
+                    setBar(players.keySet(), pl.getLang("barapi.immortalityOverInXSeconds"), graceTime * 20);
                     broadcastMessage(pl.getLang("immortalityInXSeconds").replaceAll("%time", Integer.toString(graceTime)));
                     new BukkitRunnable() {
 
@@ -109,10 +112,27 @@ public class Lobby {
                         public void run() {
                             imortal = false;
                             broadcastMessage(pl.getLang("immortalityIsOver"));
+                            removeAllBar(players.keySet());
                         }
                     }.runTaskLater(pl, graceTime * 20);
                 }
             }.runTaskLater(pl, waitTime * 20);
+        }
+    }
+
+    private void setBar(Collection<Player> playerlist, String message, int time) {
+        if(pl.config.useBarAPI) {
+            for(Player player : playerlist) {
+                BarAPI.setMessage(player, message, time);
+            }
+        }
+    }
+
+    private void removeAllBar(Collection<Player> playerlist) {
+        if(pl.config.useBarAPI) {
+            for(Player player : playerlist) {
+                BarAPI.removeBar(player);
+            }
         }
     }
 
@@ -122,6 +142,7 @@ public class Lobby {
             preparePlayersDeathmatch();
             endChestRunnable();
             endLightningRunnable();
+            setBar(players.keySet(), pl.getLang("barapi.deathmatchStartingInX"), 20 * 30);
             broadcastMessage(pl.getLang("deathmatchIn30Seconds"));
             new BukkitRunnable() {
 
@@ -131,6 +152,7 @@ public class Lobby {
                     startDeathmatchRunnable();
                     startPlayersDeathmatch();
                     broadcastMessage(pl.getLang("deathmatchStarted"));
+                    removeAllBar(players.keySet());
                 }
             }.runTaskLater(pl, 20 * 30);
         }
@@ -249,6 +271,9 @@ public class Lobby {
                             startDeathmatch();
                         }
                     }
+                    if(duration == 1) {
+                        setBar(players.keySet(), pl.getLang("barapi.gameEndingIn1Minute"), 60);
+                    }
                     if(duration <= 0) {
                         endMatch(false, false);
                     }
@@ -329,6 +354,7 @@ public class Lobby {
                             if(warnedMaior >= possibleJoinWarnedMaior) {
                                 startMatch();
                             } else {
+                                setBar(preplayers.keySet(), pl.getLang("barapi.waitingPossibleJoins"), 20 * possibleJoinsDelay);
                                 broadcastMessage(pl.getLang("waitingPossibleJoins").replaceAll("%tries", Integer.toString(warnedMaior + 1)).replaceAll("%maxtries", Integer.toString(possibleJoinWarnedMaior)));
                                 warnedMaior++;
                             }
@@ -340,6 +366,7 @@ public class Lobby {
                         if(warnedMenor >= possibleJoinWarnedMenor) {
                             startMatch();
                         } else {
+                            setBar(preplayers.keySet(), pl.getLang("barapi.waitingPossibleJoins"), 20 * possibleJoinsDelay);
                             broadcastMessage(pl.getLang("notEnoughPlayers").replaceAll("%needed", Integer.toString(minPlayers - preplayers.size())).replaceAll("%tries", Integer.toString(possibleJoinWarnedMenor - warnedMenor + 1)));
                             broadcastMessage(pl.getLang("gameWontBeWorth"));
                             warnedMenor++;
@@ -419,6 +446,7 @@ public class Lobby {
             equipWithKitItems(set.getKey(), set.getValue());
             pl.stuckPlayers.add(set.getKey().getName());
         }
+        removeAllBar(preplayers.keySet());
         preplayers.clear();
     }
 
@@ -518,6 +546,7 @@ public class Lobby {
         pl.muttated.remove(p);
         pl.config.prejoin.remove(p.getName());
         pl.stuckPlayers.remove(p.getName());
+        removeAllBar(Arrays.asList(p));
     }
 
     private void equipWithKitItems(Player player, Kit kit) {

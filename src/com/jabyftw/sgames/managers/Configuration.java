@@ -60,7 +60,8 @@ public final class Configuration {
     public Tier defaultTier, crateTier;
     public Material spectatorPlayerSelector, spectatorPlayerSponsor, spectatorMuttation, playerSearcher, playerCrate;
 
-    public boolean useVault, usePlayerPoints, useMySQL, useVoting, useAutojoin, useSponsor, tntAutoIgnite, useMuttation, tntUseFakeExplosion, useChat, announceCrateDeploy, playCrateFirework, blockDropItem;
+    public boolean useVault, usePlayerPoints, useMySQL, useVoting, useAutojoin, useSponsor, tntAutoIgnite, useMuttation, tntUseFakeExplosion, useChat, announceCrateDeploy, playCrateFirework, blockDropItem,
+            useBarAPI;
     public String waitingString, pregameString, playingString, deathmatchString, disabledString, chatFormat, crateAnnouncement, crateInventoryTitle, langPrefix;
     public int valuePerWin, valuePerKill, guiUpdateDelay, tntPower, tntDelay, maxDistance, signDelay, rankingEntries, muttationCost, muttationBonus, muttationReward, scoreboardDelay;
     public String[] signLines = new String[4];
@@ -108,6 +109,7 @@ public final class Configuration {
                 boots = {"leather_boots", "chainmail_boots", "iron_boots", "diamond_boots", "gold_boots"};
         config.addDefault("config.supportVault", false);
         config.addDefault("config.supportPlayerPoints", false);
+        config.addDefault("config.supportBarAPI", false);
         config.addDefault("config.generateExampleLobbiesConfiguration", false);
         config.addDefault("config.generateExampleItemConfiguration", true);
         config.addDefault("config.mysql.enabled", false);
@@ -160,6 +162,7 @@ public final class Configuration {
 
     private void generateLang() {
         FileConfiguration lang = langY.getConfig();
+        lang.addDefault("lang.prefix", "&c[&6SurvivalGames&c]&a ");
         lang.addDefault("lang.state.waiting", "&aWaiting");
         lang.addDefault("lang.state.pregame", "&bPre-Game");
         lang.addDefault("lang.state.playing", "&6Playing");
@@ -271,7 +274,11 @@ public final class Configuration {
         lang.addDefault("lang.setup.error.deathmatchDistanceRadiusNotSet", "&eDeathmatch kill radius threshold&f");
         lang.addDefault("lang.setup.error.deathmatchCenterNotSet", "&cDeathmatch center&f");
         lang.addDefault("lang.setup.error.deathmatchSpawnNotSet", "&cDeathmatch spawns&f");
-        lang.addDefault("lang.prefix", "&c[&6SurvivalGames&c]&a ");
+        lang.addDefault("lang.barapi.waitingPossibleJoins", "&cWaiting possible joins. &6Trying again in...");
+        lang.addDefault("lang.barapi.startingInXSeconds", "&cStarting game in...");
+        lang.addDefault("lang.barapi.immortalityOverInXSeconds", "&cImmortality time will be over in...");
+        lang.addDefault("lang.barapi.deathmatchStartingInX", "&4Deathmatch &cstarting in...");
+        lang.addDefault("lang.barapi.gameEndingIn1Minute", "&cThe game will end in...");
         langPrefix = lang.getString("lang.prefix").replaceAll("&", "§");
         langY.saveConfig();
     }
@@ -430,6 +437,7 @@ public final class Configuration {
         signDelay = config.getInt("config.ingame.dynamicsigns.UpdateTimeInTicks");
         maxDistance = config.getInt("config.ingane.playerSearcherMaxDistanceInBlocks");
         scoreboardDelay = config.getInt("config.ingame.scoreboardUpdateDelayInTicks");
+        useBarAPI = config.getBoolean("config.supportBarAPI");
         spectatorPlayerSelector = Material.valueOf(config.getString("config.ingame.spectatorPlayerSelectorItem").toUpperCase());
         spectatorPlayerSponsor = Material.valueOf(config.getString("config.ingame.spectatorPlayerSponsorItem").toUpperCase());
         spectatorMuttation = Material.valueOf(config.getString("config.ingame.spectatorMuttationItem").toUpperCase());
@@ -737,11 +745,9 @@ public final class Configuration {
 
     private boolean setupVault() {
         RegisteredServiceProvider<Economy> economyProvider = pl.getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-        if(economyProvider != null) {
-            econ = economyProvider.getProvider();
-        }
         RegisteredServiceProvider<Permission> permissionProvider = pl.getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
-        if(permissionProvider != null) {
+        if(economyProvider != null && permissionProvider != null) {
+            econ = economyProvider.getProvider();
             perm = permissionProvider.getProvider();
         }
         return (perm != null) && (econ != null);

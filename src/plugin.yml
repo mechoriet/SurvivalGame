@@ -3,7 +3,7 @@ version: 1.0
 author: rfsantos1996
 main: com.jabyftw.sgames.SurvivalGames
 description: Alternative SurvivalGames minigame plugin
-softdepend: [Vault,PlayerPoints]
+softdepend: [Vault,PlayerPoints,BarAPI]
 commands:
    sg:
      description: Main player command
