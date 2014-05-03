@@ -442,7 +442,7 @@ public class Lobby {
             jog.setPlaying(true);
             players.put(set.getKey(), jog);
             set.getKey().teleport(arenaManager.getSpawnLocation());
-            pl.cleanPlayer(set.getKey(), false);
+            pl.cleanPlayer(set.getKey(), false, false);
             equipWithKitItems(set.getKey(), set.getValue());
             pl.stuckPlayers.add(set.getKey().getName());
         }
@@ -526,7 +526,7 @@ public class Lobby {
                     j.getRanking().addDeathToCounter();
                 }
             }
-            pl.cleanPlayer(p, false);
+            pl.cleanPlayer(p, false, true);
             players.remove(p);
             if(checkwin) {
                 checkWin();
@@ -536,7 +536,7 @@ public class Lobby {
             p.teleport(arenaManager.getExitLocation());
         } else if(spectators.containsKey(p)) {
             pl.makeVisible(p);
-            pl.cleanPlayer(p, false);
+            pl.cleanPlayer(p, false, true);
             spectators.remove(p);
             p.teleport(arenaManager.getExitLocation());
         }
@@ -877,7 +877,7 @@ public class Lobby {
     }
 
     public void setSpectator(Player player) {
-        pl.cleanPlayer(player, true);
+        pl.cleanPlayer(player, true, true);
         for(ItemStack is : pl.config.spectatorInventory) {
             player.getInventory().addItem(is);
         }
@@ -915,7 +915,7 @@ public class Lobby {
         }
         jogador.setPlaying(true);
         jogador.setAlreadyMuttated(true);
-        pl.cleanPlayer(jogador.getPlayer(), false);
+        pl.cleanPlayer(jogador.getPlayer(), false, false);
         pl.makeVisible(jogador.getPlayer());
         equipWithKitItems(jogador.getPlayer(), pl.config.muttationKit);
         jogador.getPlayer().teleport(arenaManager.getSpawnLocation());

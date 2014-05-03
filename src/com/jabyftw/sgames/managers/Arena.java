@@ -133,7 +133,9 @@ public class Arena {
 
     public boolean addBrokenBlock(Player p, Location loc, Material mat) {
         if(allowBreak.contains(mat) || p.hasPermission(pl.permissions.operator_breakall)) {
-            changedBlocks.put(loc, mat);
+            if(changedBlocks.containsKey(loc)) {
+                changedBlocks.put(loc, changedBlocks.remove(loc));
+            }
             return true;
         }
         return false;
@@ -141,7 +143,9 @@ public class Arena {
 
     public boolean addPlacedBlock(Player p, Location loc, Material mat) {
         if(allowPlace.contains(mat) || p.hasPermission(pl.permissions.operator_placeall)) {
-            changedBlocks.put(loc, mat);
+            if(changedBlocks.containsKey(loc)) {
+                changedBlocks.put(loc, changedBlocks.remove(loc));
+            }
             return true;
         }
         return false;

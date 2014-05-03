@@ -120,7 +120,7 @@ public class SurvivalGames extends JavaPlugin {
         return random.nextInt((max - min) + 1) + min;
     }
 
-    public void cleanPlayer(Player p, boolean flying) {
+    public void cleanPlayer(Player p, boolean flying, boolean removeScoreboard) {
         p.setGameMode(GameMode.SURVIVAL);
         p.setMaxHealth(20);
         p.setHealth(p.getMaxHealth());
@@ -134,7 +134,9 @@ public class SurvivalGames extends JavaPlugin {
         p.resetPlayerWeather();
         p.getInventory().clear();
         p.getInventory().setArmorContents(null);
-        p.setScoreboard(getServer().getScoreboardManager().getMainScoreboard());
+        if(removeScoreboard) {
+            p.setScoreboard(getServer().getScoreboardManager().getMainScoreboard());
+        }
         //noinspection deprecation
         p.updateInventory();
     }

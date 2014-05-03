@@ -35,7 +35,8 @@ public class ScoreboardManager implements Listener {
     private final ArrayList<Score> scorelist = new ArrayList<Score>();
 
     private BukkitTask runnable = null;
-    private boolean resetScoreboard = true;
+    private String title;
+    private boolean resetScoreboard;
 
     public ScoreboardManager(SurvivalGames pl, Jogador jogador, int delay, Replacer replacer) {
         this.pl = pl;
@@ -43,17 +44,17 @@ public class ScoreboardManager implements Listener {
         this.delay = delay;
         this.replacer = replacer;
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        jogador.getPlayer().setScoreboard(scoreboard);
         startRunnable();
         pl.getServer().getPluginManager().registerEvents(this, pl);
     }
 
-    public void setLines(String title, String[] lines) {
+    public void setLines(String titleStr, String[] lines) {
         line.clear();
         for(int i = 0; i < lines.length; i++) {
             line.put(fixDuplicates(!lines[i].equalsIgnoreCase("blank") ? lines[i] : " "), i + 1);
         }
-        objective.setDisplayName(replacer.replaceString(title).length() < 16 ? replacer.replaceString(title) : "title too big");
+        this.title = titleStr;
+        objective.setDisplayName(replacer.replaceString(this.title).length() < 16 ? replacer.replaceString(this.title) : "title too big");
     }
 
     private String fixDuplicates(String text) {
@@ -68,13 +69,17 @@ public class ScoreboardManager implements Listener {
 
     public void startRunnable() {
         stopRunnable(false);
+        resetScoreboard = true;
         runnable = new BukkitRunnable() {
+
+            Scoreboard lastSb = null;
 
             @Override
             public void run() {
-                if(resetScoreboard && !jogador.getPlayer().getScoreboard().equals(scoreboard)) {
+                if(!lastSb.equals(jogador.getPlayer().getScoreboard()) && resetScoreboard) {
                     jogador.getPlayer().setScoreboard(scoreboard);
                 }
+                lastSb = jogador.getPlayer().getScoreboard();
                 for(Map.Entry<String, Integer> entry : line.entrySet()) {
                     for(Score oldscore : scorelist) {
                         if(oldscore != null) {
@@ -89,11 +94,13 @@ public class ScoreboardManager implements Listener {
                     newscore.setScore(entry.getValue());*/
                     scorelist.add(newscore);
                 }
+                objective.setDisplayName(replacer.replaceString(title).length() < 16 ? replacer.replaceString(title) : "title too big");
             }
         }.runTaskTimer(pl, 1, delay);
     }
 
     public void stopRunnable(boolean removeScoreboard) {
+        resetScoreboard = false;
         if(runnable != null) {
             runnable.cancel();
             runnable = null;
@@ -117,7 +124,6 @@ public class ScoreboardManager implements Listener {
         if(quitter.equals(jogador.getPlayer())) {
             stopRunnable(true);
             HandlerList.unregisterAll(this);
-            resetScoreboard = false;
         }
     }
 
