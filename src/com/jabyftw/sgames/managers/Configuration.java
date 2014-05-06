@@ -1444,7 +1444,6 @@ public final class Configuration {
         pl.muttated.clear();
         pl.invisiblePlayers.clear();
         pl.haveMuttated.clear();
-        pl.stuckPlayers.clear();
         pl.supplyCrates.clear();
         prejoin.clear();
         saveDynamicSigns();

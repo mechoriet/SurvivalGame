@@ -76,6 +76,7 @@ public class SGExecutor implements CommandExecutor {
                     Player player = (Player) sender;
                     if(!pl.config.useVoting) {
                         if(pl.players.containsKey(player)) {
+                            player.teleport(pl.players.get(player).getArena().getExitLocation());
                             pl.players.get(player).removePlayer(player, true);
                             sender.sendMessage(pl.getLang("command.youLeftTheLobby"));
                             return true;

@@ -85,11 +85,11 @@ public class EventListener implements Listener {
     @EventHandler(ignoreCancelled = false)
     public void onInteract(PlayerInteractEvent e) {
         Player player = e.getPlayer();
-        if(pl.stuckPlayers.contains(player.getName())) {
-            e.setCancelled(true);
-        } else if(pl.players.containsKey(player)) {
+        if(pl.players.containsKey(player)) {
             Lobby lobby = pl.players.get(player);
-            if(lobby.isPlayerAlive(player)) {
+            if(lobby.isStuck()) {
+                e.setCancelled(true);
+            } else if(lobby.isPlayerAlive(player)) {
                 if(player.getItemInHand() != null) {
                     if(e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
                         if(player.getItemInHand().getType().equals(pl.config.playerSearcher)) {
@@ -323,7 +323,7 @@ public class EventListener implements Listener {
             }
         } else if(e.getDamager() instanceof Player) {
             Player damager = (Player) e.getDamager();
-            if(pl.stuckPlayers.contains(damager.getName()) || (pl.players.containsKey(damager) && !pl.players.get(damager).isPlayerAlive(damager))) {
+            if((pl.players.containsKey(damager) && (!pl.players.get(damager).isPlayerAlive(damager)) || pl.players.get(damager).isStuck())) {
                 e.setCancelled(true);
             }
         }
@@ -334,7 +334,7 @@ public class EventListener implements Listener {
         if(e.getEntity() instanceof Player) {
             Player player = (Player) e.getEntity();
             if(pl.players.containsKey(player)) {
-                if(pl.players.get(player).getImortality() || pl.players.get(player).isPlayerSpectator(player)) {
+                if(pl.players.get(player).getImortality() || pl.players.get(player).isStuck() || pl.players.get(player).isPlayerSpectator(player)) {
                     e.setCancelled(true);
                 } else {
                     if(player.getHealth() - e.getDamage() <= 0 && !e.isCancelled()) {
@@ -372,7 +372,7 @@ public class EventListener implements Listener {
 
     @EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)
     public void onMove(PlayerMoveEvent e) {
-        if(pl.stuckPlayers.contains(e.getPlayer().getName())) {
+        if(pl.players.containsKey(e.getPlayer()) && pl.players.get(e.getPlayer()).isStuck()) {
             Player player = e.getPlayer();
             Location from = e.getFrom();
             Location to = e.getTo();
@@ -439,7 +439,6 @@ public class EventListener implements Listener {
         if(pl.players.containsKey(player)) {
             pl.players.get(player).removePlayer(player, true);
         }
-        pl.stuckPlayers.remove(player.getName());
         pl.config.prejoin.remove(player.getName());
         pl.muttated.remove(player);
         pl.makeVisible(player);

@@ -41,7 +41,7 @@ public class SurvivalGames extends JavaPlugin {
     public HashMap<Player, String> muttated = new HashMap<Player, String>();
     public HashMap<Lobby, ArrayList<Sign>> dynamicSigns = new HashMap<Lobby, ArrayList<Sign>>();
     public ArrayList<Player> invisiblePlayers = new ArrayList<Player>();
-    public ArrayList<String> haveMuttated = new ArrayList<String>(), stuckPlayers = new ArrayList<String>();
+    public ArrayList<String> haveMuttated = new ArrayList<String>();
     public ArrayList<SupplyCrate> supplyCrates = new ArrayList<SupplyCrate>();
 
     @Override

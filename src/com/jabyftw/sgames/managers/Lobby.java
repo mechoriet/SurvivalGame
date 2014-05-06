@@ -43,7 +43,7 @@ public class Lobby {
 
     private IconMenu[] playerList;
     private State state = State.DISABLED;
-    private boolean imortal, worth;
+    private boolean imortal, worth, stuck;
     private int duration;
     private BukkitTask durationRunnable, deathmatchRunnable, chestRunnable, lightningRunnable, waitingRunnable;
 
@@ -82,6 +82,7 @@ public class Lobby {
     public void startMatch() {
         if(state == State.WAITING && preplayers.size() > 0) {
             state = State.PREGAME;
+            stuck = true;
             endWaitingRunnable();
             arenaManager.removeEntities();
             prepareAllPlayers();
@@ -98,14 +99,15 @@ public class Lobby {
                     startChestRunnable();
                     startLightningRunnable();
                     startAllPlayers();
+                    updatePlayersScoreboards();
+                    stuck = false;
                     broadcastMessage(pl.getLang("gameStarted"));
                     worth = getAliveJogador().size() >= minPlayers;
                     if(!worth) {
                         broadcastMessage(pl.getLang("gameIsntWorth"));
                     }
-                    updatePlayersScoreboards();
-                    setBar(players.keySet(), pl.getLang("barapi.immortalityOverInXSeconds"), graceTime * 20);
                     broadcastMessage(pl.getLang("immortalityInXSeconds").replaceAll("%time", Integer.toString(graceTime)));
+                    setBar(players.keySet(), pl.getLang("barapi.immortalityOverInXSeconds"), graceTime * 20);
                     new BukkitRunnable() {
 
                         @Override
@@ -142,6 +144,8 @@ public class Lobby {
             preparePlayersDeathmatch();
             endChestRunnable();
             endLightningRunnable();
+            imortal = true;
+            stuck = true;
             setBar(players.keySet(), pl.getLang("barapi.deathmatchStartingInX"), 20 * 30);
             broadcastMessage(pl.getLang("deathmatchIn30Seconds"));
             new BukkitRunnable() {
@@ -151,6 +155,8 @@ public class Lobby {
                     startLightningRunnable();
                     startDeathmatchRunnable();
                     startPlayersDeathmatch();
+                    stuck = false;
+                    imortal = false;
                     broadcastMessage(pl.getLang("deathmatchStarted"));
                     removeAllBar(players.keySet());
                 }
@@ -165,6 +171,8 @@ public class Lobby {
             arenaManager.removeFallenCrates();
             arenaManager.clearInventories();
             arenaManager.restoreBrokenAndPlacedBlocks();
+            stuck = false;
+            imortal = true;
             endDeathmatchRunnable();
             endDurationRunnable();
             endChestRunnable();
@@ -425,9 +433,6 @@ public class Lobby {
     private void startAllPlayers() {
         for(Jogador j : getAliveJogador()) {
             Player p = j.getPlayer();
-            if(pl.stuckPlayers.contains(p.getName())) {
-                pl.stuckPlayers.remove(p.getName());
-            }
             givePlayerPermissions(j.getPlayer(), j.getKit());
             j.getKit().usePotionEffects(j);
             p.setPlayerTime(1, true);
@@ -449,7 +454,6 @@ public class Lobby {
             set.getKey().teleport(arenaManager.getSpawnLocation());
             pl.cleanPlayer(set.getKey(), false, false);
             equipWithKitItems(set.getKey(), set.getValue());
-            pl.stuckPlayers.add(set.getKey().getName());
         }
         removeAllBar(preplayers.keySet());
         preplayers.clear();
@@ -460,7 +464,6 @@ public class Lobby {
             for(Jogador j : getAliveJogador()) {
                 Player p = j.getPlayer();
                 p.teleport(arenaManager.getDeathmatchSpawnLocation());
-                pl.stuckPlayers.add(p.getName());
             }
         }
     }
@@ -469,9 +472,6 @@ public class Lobby {
         if(state == State.DEATHMATCH) {
             for(Jogador j : getAliveJogador()) {
                 Player p = j.getPlayer();
-                if(pl.stuckPlayers.contains(p.getName())) {
-                    pl.stuckPlayers.remove(p.getName());
-                }
             }
         }
     }
@@ -550,7 +550,6 @@ public class Lobby {
         preplayers.remove(p);
         pl.muttated.remove(p);
         pl.config.prejoin.remove(p.getName());
-        pl.stuckPlayers.remove(p.getName());
         removeAllBar(Arrays.asList(p));
     }
 
@@ -979,5 +978,9 @@ public class Lobby {
 
     public int getPossibleJoinsDelay() {
         return possibleJoinsDelay;
+    }
+
+    public boolean isStuck() {
+        return stuck;
     }
 }
