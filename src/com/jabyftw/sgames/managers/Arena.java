@@ -309,7 +309,7 @@ public class Arena {
         }
         for(Entity e : entitiesToRemove) {
             if(pl.config.entitiesToRemove.contains(e.getType()) && !e.getType().equals(EntityType.PLAYER)) {
-                if(!e.isDead()) {
+                if(e.isValid()) {
                     e.remove();
                 }
             }
