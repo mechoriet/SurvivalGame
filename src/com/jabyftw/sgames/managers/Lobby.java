@@ -364,7 +364,12 @@ public class Lobby {
                     } else {
                         warnedMaior = 0;
                         if(warnedMenor >= possibleJoinWarnedMenor) {
-                            startMatch();
+                            if(preplayers.size() >= 2) {
+                                startMatch();
+                            } else {
+                                warnedMenor = 0;
+                                broadcastMessage(pl.getLang("youNeedATLEAST2People"));
+                            }
                         } else {
                             setBar(preplayers.keySet(), pl.getLang("barapi.waitingPossibleJoins"), 20 * possibleJoinsDelay);
                             broadcastMessage(pl.getLang("notEnoughPlayers").replaceAll("%needed", Integer.toString(minPlayers - preplayers.size())).replaceAll("%tries", Integer.toString(possibleJoinWarnedMenor - warnedMenor + 1)));

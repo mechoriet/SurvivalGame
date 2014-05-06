@@ -3,6 +3,7 @@ version: 1.0
 author: rfsantos1996
 main: com.jabyftw.sgames.SurvivalGames
 description: Alternative SurvivalGames minigame plugin
+startup: postworld
 softdepend: [Vault,PlayerPoints,BarAPI,Multiverse-Core]
 commands:
    sg:

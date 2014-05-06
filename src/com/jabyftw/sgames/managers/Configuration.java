@@ -212,6 +212,7 @@ public final class Configuration {
         lang.addDefault("lang.muttationSucceededTargetKilled", "&6Muttation succeeded, you gained bonus points for target killed.");
         lang.addDefault("lang.playerDeath", "&c%displayname &4died. &cThere are &6%alive &cplayers alive.");
         lang.addDefault("lang.reloadedInXms", "&6Plugin reloaded in &c%timems&6.");
+        lang.addDefault("lang.youNeedATLEAST2People", "&cLobby needs &4AT LEAST &c2 players to start.");
         lang.addDefault("lang.command.durationDidntStarted", "&4--");
         lang.addDefault("lang.command.listTitle", "&6- Game list -");
         lang.addDefault("lang.command.listEntry", "&cName: &6%displayname &7|&c %alive&6/&c%min&6/&c%max &7|&c %state &7|&c Time: &6%time min.");
@@ -583,11 +584,11 @@ public final class Configuration {
                 maxDuration = lobbies.getInt("lobbies." + path + ".maxMatchDurationInMinutes"),
                 chestdelay = lobbies.getInt("lobbies." + path + ".chestRefreshDelayInSeconds"),
                 lightning = lobbies.getInt("lobbies." + path + ".playerCountToLightningEverybody"),
-                grace = lobbies.getInt("lobbies." + path + ".immortalityTimeAfterMatchStartInSeconds"),
-                wait = lobbies.getInt("lobbies." + path + ".waitTimeUntilMatchStartInSeconds"),
-                warnedmaior = lobbies.getInt("lobbies." + path + ".numberOfTriesWithEnoughPlayers"),
-                warnedmenor = lobbies.getInt("lobbies." + path + ".numberOfTriesWithoutEnoughPlayers"),
-                possiblejoinsdelay = lobbies.getInt("lobbies." + path + ".delayOfEachTry");
+                grace = lobbies.getInt("lobbies." + path + ".immortalityTimeAfterMatchStartInSeconds", 45),
+                wait = lobbies.getInt("lobbies." + path + ".waitTimeUntilMatchStartInSeconds", 30),
+                warnedmaior = lobbies.getInt("lobbies." + path + ".numberOfTriesWithEnoughPlayers", 2),
+                warnedmenor = lobbies.getInt("lobbies." + path + ".numberOfTriesWithoutEnoughPlayers", 3),
+                possiblejoinsdelay = lobbies.getInt("lobbies." + path + ".delayOfEachTry", 30);
         Location corner1 = resolveLocation(lobbies.getString("lobbies." + path + ".firstCornerLocation")),
                 corner2 = resolveLocation(lobbies.getString("lobbies." + path + ".secondCornerLocation")),
                 spectator = resolveLocation(lobbies.getString("lobbies." + path + ".spectatorSpawnLocation")),
@@ -1417,7 +1418,7 @@ public final class Configuration {
                                 sign.setLine(i, signLines[i]
                                         .replaceAll("%path", set.getKey().getPath())
                                         .replaceAll("%displayname", set.getKey().getName())
-                                        .replaceAll("%alive", Integer.toString(set.getKey().getAliveJogador().size()))
+                                        .replaceAll("%alive", set.getKey().getAliveNonMutattorSize())
                                         .replaceAll("%min", Integer.toString(set.getKey().getMinPlayers()))
                                         .replaceAll("%max", Integer.toString(set.getKey().getMaxPlayers()))
                                         .replaceAll("%state", pl.getStateName(set.getKey().getCurrentState())));
