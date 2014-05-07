@@ -80,7 +80,7 @@ public class ScoreboardManager implements Listener {
 
             @Override
             public void run() {
-                if(!lastSb.equals(jogador.getPlayer().getScoreboard()) && resetScoreboard) {
+                if((lastSb == null || !lastSb.equals(jogador.getPlayer().getScoreboard())) && resetScoreboard) {
                     jogador.getPlayer().setScoreboard(scoreboard);
                 }
                 lastSb = jogador.getPlayer().getScoreboard();

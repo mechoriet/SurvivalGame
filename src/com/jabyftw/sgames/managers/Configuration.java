@@ -461,11 +461,11 @@ public final class Configuration {
         rankingEntries = config.getInt("config.ingame.rankingEntriesSize");
         guiUpdateDelay = gui.getInt("config.updateDelayInSeconds");
         useSponsor = items.getBoolean("sponsor.enabled");
-        waitingString = pl.getLang("state.waiting");
-        pregameString = pl.getLang("state.pregame");
-        playingString = pl.getLang("state.playing");
-        deathmatchString = pl.getLang("state.deathmatch");
-        disabledString = pl.getLang("state.disabled");
+        waitingString = pl.getNoPrefixLang("state.waiting");
+        pregameString = pl.getNoPrefixLang("state.pregame");
+        playingString = pl.getNoPrefixLang("state.playing");
+        deathmatchString = pl.getNoPrefixLang("state.deathmatch");
+        disabledString = pl.getNoPrefixLang("state.disabled");
         disabledPage = resolveItemStack(gui.getStringList("items.disabledPageItem"));
         nextPage = resolveItemStack(gui.getStringList("items.nextPageItem"));
         backPage = resolveItemStack(gui.getStringList("items.backPageItem"));
