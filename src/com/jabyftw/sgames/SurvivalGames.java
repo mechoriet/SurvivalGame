@@ -109,7 +109,12 @@ public class SurvivalGames extends JavaPlugin {
     }
 
     public String getLang(String path) {
-        return config.langPrefix + getNoPrefixLang(path);
+        String message = getNoPrefixLang(path);
+        if(message.length() > 0) {
+            return config.langPrefix + message;
+        } else {
+            return "";
+        }
     }
 
     public String getNoPrefixLang(String path) {

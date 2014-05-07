@@ -176,7 +176,7 @@ public final class Configuration {
         lang.addDefault("lang.tooFarFromCenter", "&cToo far from deathmatch center. &4Go back!");
         lang.addDefault("lang.deathmatchWillStartIn", "&4Deathmatch &cwill start in &6%minutes minutes&c.");
         lang.addDefault("lang.chestRefilled", "&eChests were filled with items.");
-        lang.addDefault("lang.notEnoughPlayers", "&cNot enough players to start. &6Needed %needed more players or %minutes minutes.");
+        lang.addDefault("lang.notEnoughPlayers", "&cNot enough players to start. &6Needed %needed more players or %tries tries.");
         lang.addDefault("lang.startedInXSeconds", "&aThe game &6will start in %time seconds.");
         lang.addDefault("lang.deathmatchIn30Seconds", "&4Deathmatch &cwill start in 30 seconds.");
         lang.addDefault("lang.gameStarted", "&aGame started! &6Good luck and have fun!");
