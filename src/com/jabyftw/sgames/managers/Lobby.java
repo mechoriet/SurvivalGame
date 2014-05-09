@@ -67,7 +67,19 @@ public class Lobby {
         this.minPlayers = min;
         this.maxPlayers = max;
         this.graceTime = gracetime;
+        if(waittime <= 0) {
+            waittime = 30;
+        }
         this.waitTime = waittime;
+        if(warnedmaior <= 0) {
+            warnedmaior = 2;
+        }
+        if(warnedmenor <= 0) {
+            warnedmenor = 3;
+        }
+        if(possiblejoinsdelay <= 0) {
+            possiblejoinsdelay = 30;
+        }
         this.possibleJoinWarnedMaior = warnedmaior;
         this.possibleJoinWarnedMenor = warnedmenor;
         this.possibleJoinsDelay = possiblejoinsdelay;
@@ -75,12 +87,12 @@ public class Lobby {
             state = State.WAITING;
             duration = this.matchDuration;
             startWaitingRunnable();
-            pl.getLogger().log(Level.INFO, "Lobby {0} is ready for use.", path);
+            pl.getLogger().log(Level.INFO, "Lobby " + path + " is ready for use.");
         }
     }
 
     public void startMatch() {
-        if(state == State.WAITING && preplayers.size() > 0) {
+        if(state == State.WAITING && preplayers.size() >= 2) {
             state = State.PREGAME;
             stuck = true;
             endWaitingRunnable();
@@ -88,7 +100,7 @@ public class Lobby {
             prepareAllPlayers();
             updatePlayersScoreboards();
             broadcastMessage(pl.getLang("startedInXSeconds").replaceAll("%time", Integer.toString(waitTime)));
-            setBar(players.keySet(), pl.getLang("barapi.startingInXSeconds"), waitTime * 20);
+            setBar(players.keySet(), pl.getLang("barapi.startingInXSeconds"), waitTime);
             new BukkitRunnable() {
 
                 @Override
@@ -107,7 +119,7 @@ public class Lobby {
                         broadcastMessage(pl.getLang("gameIsntWorth"));
                     }
                     broadcastMessage(pl.getLang("immortalityInXSeconds").replaceAll("%time", Integer.toString(graceTime)));
-                    setBar(players.keySet(), pl.getLang("barapi.immortalityOverInXSeconds"), graceTime * 20);
+                    setBar(players.keySet(), pl.getLang("barapi.immortalityOverInXSeconds"), graceTime);
                     new BukkitRunnable() {
 
                         @Override
@@ -146,7 +158,7 @@ public class Lobby {
             endLightningRunnable();
             imortal = true;
             stuck = true;
-            setBar(players.keySet(), pl.getLang("barapi.deathmatchStartingInX"), 20 * 30);
+            setBar(players.keySet(), pl.getLang("barapi.deathmatchStartingInX"), 30);
             broadcastMessage(pl.getLang("deathmatchIn30Seconds"));
             new BukkitRunnable() {
 
@@ -154,7 +166,6 @@ public class Lobby {
                 public void run() {
                     startLightningRunnable();
                     startDeathmatchRunnable();
-                    startPlayersDeathmatch();
                     stuck = false;
                     imortal = false;
                     broadcastMessage(pl.getLang("deathmatchStarted"));
@@ -362,7 +373,7 @@ public class Lobby {
                             if(warnedMaior >= possibleJoinWarnedMaior) {
                                 startMatch();
                             } else {
-                                setBar(preplayers.keySet(), pl.getLang("barapi.waitingPossibleJoins"), 20 * possibleJoinsDelay);
+                                setBar(preplayers.keySet(), pl.getLang("barapi.waitingPossibleJoins"), possibleJoinsDelay);
                                 broadcastMessage(pl.getLang("waitingPossibleJoins").replaceAll("%tries", Integer.toString(warnedMaior + 1)).replaceAll("%maxtries", Integer.toString(possibleJoinWarnedMaior)));
                                 warnedMaior++;
                             }
@@ -377,9 +388,10 @@ public class Lobby {
                             } else {
                                 warnedMenor = 0;
                                 broadcastMessage(pl.getLang("youNeedATLEAST2People"));
+                                setBar(preplayers.keySet(), pl.getLang("barapi.tryingAgain"), possibleJoinsDelay);
                             }
                         } else {
-                            setBar(preplayers.keySet(), pl.getLang("barapi.waitingPossibleJoins"), 20 * possibleJoinsDelay);
+                            setBar(preplayers.keySet(), pl.getLang("barapi.waitingPossibleJoins"), possibleJoinsDelay);
                             broadcastMessage(pl.getLang("notEnoughPlayers").replaceAll("%needed", Integer.toString(minPlayers - preplayers.size())).replaceAll("%tries", Integer.toString(possibleJoinWarnedMenor - warnedMenor + 1)));
                             broadcastMessage(pl.getLang("gameWontBeWorth"));
                             warnedMenor++;
@@ -468,14 +480,6 @@ public class Lobby {
         }
     }
 
-    private void startPlayersDeathmatch() {
-        if(state == State.DEATHMATCH) {
-            for(Jogador j : getAliveJogador()) {
-                Player p = j.getPlayer();
-            }
-        }
-    }
-
     private Jogador getTheOnlyPlayer() {
         List<Jogador> list = new ArrayList<Jogador>(getAliveNonMuttatorPlayers());
         if(list.size() == 1) {
@@ -525,7 +529,9 @@ public class Lobby {
             Jogador j = players.get(p);
             j.getScoreboardManager().stopRunnable(true);
             if(j.isPlaying()) {
-                dropInventory(p);
+                if(state == State.PLAYING || state == State.DEATHMATCH) {
+                    dropInventory(p);
+                }
                 j.setPlaying(false);
                 if(worth) {
                     j.getRanking().addDeathToCounter();
@@ -538,12 +544,10 @@ public class Lobby {
             }
             updatePlayerList();
             pl.makeVisible(p);
-            p.teleport(arenaManager.getExitLocation());
         } else if(spectators.containsKey(p)) {
             pl.makeVisible(p);
             pl.cleanPlayer(p, false, true);
             spectators.remove(p);
-            p.teleport(arenaManager.getExitLocation());
         }
         sponsors.remove(p);
         onSponsoring.remove(p);
@@ -551,6 +555,7 @@ public class Lobby {
         pl.muttated.remove(p);
         pl.config.prejoin.remove(p.getName());
         removeAllBar(Arrays.asList(p));
+        p.teleport(arenaManager.getExitLocation());
     }
 
     private void equipWithKitItems(Player player, Kit kit) {

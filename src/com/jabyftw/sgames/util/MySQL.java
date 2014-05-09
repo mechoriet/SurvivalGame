@@ -34,7 +34,10 @@ public class MySQL {
             conn = DriverManager.getConnection(url, user, pass);
         } catch(SQLException e) {
             pl.getLogger().log(Level.WARNING, "Couldn't connect to MySQL: " + e.getMessage());
+        } catch(NullPointerException ignored) {
+            pl.getLogger().log(Level.WARNING, "Couldn't connect to MySQL: incorrect database configuration.");
         }
+
         return conn;
     }
 

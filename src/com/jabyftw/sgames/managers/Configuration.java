@@ -280,6 +280,7 @@ public final class Configuration {
         lang.addDefault("lang.barapi.immortalityOverInXSeconds", "&cImmortality time will be over in...");
         lang.addDefault("lang.barapi.deathmatchStartingInX", "&4Deathmatch &cstarting in...");
         lang.addDefault("lang.barapi.gameEndingIn1Minute", "&cThe game will end in...");
+        lang.addDefault("lang.barapi.tryingAgain", "&cTrying again in...");
         langPrefix = lang.getString("lang.prefix").replaceAll("&", "§");
         langY.saveConfig();
     }
@@ -584,11 +585,11 @@ public final class Configuration {
                 maxDuration = lobbies.getInt("lobbies." + path + ".maxMatchDurationInMinutes"),
                 chestdelay = lobbies.getInt("lobbies." + path + ".chestRefreshDelayInSeconds"),
                 lightning = lobbies.getInt("lobbies." + path + ".playerCountToLightningEverybody"),
-                grace = lobbies.getInt("lobbies." + path + ".immortalityTimeAfterMatchStartInSeconds", 45),
-                wait = lobbies.getInt("lobbies." + path + ".waitTimeUntilMatchStartInSeconds", 30),
-                warnedmaior = lobbies.getInt("lobbies." + path + ".numberOfTriesWithEnoughPlayers", 2),
-                warnedmenor = lobbies.getInt("lobbies." + path + ".numberOfTriesWithoutEnoughPlayers", 3),
-                possiblejoinsdelay = lobbies.getInt("lobbies." + path + ".delayOfEachTry", 30);
+                grace = lobbies.getInt("lobbies." + path + ".immortalityTimeAfterMatchStartInSeconds"),
+                wait = lobbies.getInt("lobbies." + path + ".waitTimeUntilMatchStartInSeconds"),
+                warnedmaior = lobbies.getInt("lobbies." + path + ".numberOfTriesWithEnoughPlayers"),
+                warnedmenor = lobbies.getInt("lobbies." + path + ".numberOfTriesWithoutEnoughPlayers"),
+                possiblejoinsdelay = lobbies.getInt("lobbies." + path + ".delayOfEachTry");
         Location corner1 = resolveLocation(lobbies.getString("lobbies." + path + ".firstCornerLocation")),
                 corner2 = resolveLocation(lobbies.getString("lobbies." + path + ".secondCornerLocation")),
                 spectator = resolveLocation(lobbies.getString("lobbies." + path + ".spectatorSpawnLocation")),
