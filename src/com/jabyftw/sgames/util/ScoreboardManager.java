@@ -102,7 +102,6 @@ public class ScoreboardManager implements Listener {
             scoreboardValue.resetScore();
         }
         scorelist.clear();
-        objective.unregister();
         if(removeScoreboard) {
             jogador.getPlayer().setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
         }
