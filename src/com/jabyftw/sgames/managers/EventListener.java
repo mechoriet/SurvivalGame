@@ -324,7 +324,7 @@ public class EventListener implements Listener {
         }
         if(e.getDamager() instanceof Player) {
             Player damager = (Player) e.getDamager();
-            if(pl.players.containsKey(damager) && (!pl.players.get(damager).isPlayerAlive(damager)) || pl.players.get(damager).isStuck()) {
+            if(pl.players.containsKey(damager) && (!pl.players.get(damager).isPlayerAlive(damager) || pl.players.get(damager).isStuck())) {
                 e.setCancelled(true);
             }
         }

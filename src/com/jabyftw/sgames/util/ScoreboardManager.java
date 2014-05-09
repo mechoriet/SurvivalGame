@@ -35,7 +35,6 @@ public class ScoreboardManager implements Listener {
 
     private BukkitTask runnable = null;
     private String title;
-    private boolean resetScoreboard;
 
     public ScoreboardManager(SurvivalGames pl, Jogador jogador, int delay, Replacer replacer) {
         this.pl = pl;
@@ -43,57 +42,58 @@ public class ScoreboardManager implements Listener {
         this.delay = delay;
         this.replacer = replacer;
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        startRunnable();
         pl.getServer().getPluginManager().registerEvents(this, pl);
     }
 
     public void setLines(String titleStr, String[] lines) {
+        stopRunnable(false);
         for(ScoreboardValue scoreboardValue : scorelist) {
             scoreboardValue.resetScore();
         }
         scorelist.clear();
-        for(int i = 0; i < lines.length; i++) {
-            scorelist.add(new ScoreboardValue(fixDuplicates(!lines[i].equalsIgnoreCase("blank") ? lines[i] : " "), i + 1));
-        }
         this.title = titleStr;
-        objective.setDisplayName(replacer.replaceString(this.title).length() < 16 ? replacer.replaceString(this.title) : "title too big");
+        updateDisplayName();
+        for(int i = 0; i < lines.length; i++) {
+            scorelist.add(new ScoreboardValue(fixDuplicates(!lines[i].equalsIgnoreCase("blank") ? lines[i] : "§r"), i + 1));
+        }
+        startRunnable();
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                jogador.getPlayer().setScoreboard(scoreboard);
+            }
+        }.runTaskLater(pl, 2);
+    }
+
+    private void updateDisplayName() {
+        objective.setDisplayName(replacer.replaceString(this.title).length() <= 16 ? replacer.replaceString(this.title) : replacer.replaceString(this.title).substring(0, 16));
     }
 
     private String fixDuplicates(String text) {
         for(ScoreboardValue scoreboardValue : scorelist) {
-            if(text.equalsIgnoreCase(scoreboardValue.getStringOriginal())) {
-                text += " ";
+            while(text.equalsIgnoreCase(scoreboardValue.getStringOriginal())) {
+                text += "§r";
             }
-        }
-        if(text.length() > 16) {
-            text = text.substring(0, 15);
         }
         return text;
     }
 
     public void startRunnable() {
         stopRunnable(false);
-        resetScoreboard = true;
         runnable = new BukkitRunnable() {
-
-            Scoreboard lastSb = null;
 
             @Override
             public void run() {
-                if((lastSb == null || !lastSb.equals(jogador.getPlayer().getScoreboard())) && resetScoreboard) {
-                    jogador.getPlayer().setScoreboard(scoreboard);
-                }
-                lastSb = jogador.getPlayer().getScoreboard();
+                updateDisplayName();
                 for(ScoreboardValue scoreboardValue : scorelist) {
                     scoreboardValue.update();
                 }
-                objective.setDisplayName(replacer.replaceString(title).length() < 16 ? replacer.replaceString(title) : "title too big");
             }
         }.runTaskTimer(pl, 1, delay);
     }
 
     public void stopRunnable(boolean removeScoreboard) {
-        resetScoreboard = false;
         if(runnable != null) {
             runnable.cancel();
             runnable = null;
@@ -101,8 +101,8 @@ public class ScoreboardManager implements Listener {
         for(ScoreboardValue scoreboardValue : scorelist) {
             scoreboardValue.resetScore();
         }
-        scorelist.clear();
         if(removeScoreboard) {
+            scorelist.clear();
             jogador.getPlayer().setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
         }
     }
@@ -148,17 +148,24 @@ public class ScoreboardManager implements Listener {
         }
 
         public void update() {
-            String stringNova = replacer.replaceString(stringOriginal);
-            if(!stringAtual.equalsIgnoreCase(stringNova)) {
+            String stringNova = fixLength(replacer.replaceString(stringOriginal));
+            if(!stringAtual.equalsIgnoreCase(stringNova) || scoreAtual == null) {
                 resetScore();
-                scoreAtual = objective.getScore(Bukkit.getOfflinePlayer(stringNova));
+                scoreAtual = objective.getScore(stringNova);
                 scoreAtual.setScore(line);
             }
         }
 
+        private String fixLength(String string) {
+            if(string.length() > 16) {
+                string = string.substring(0, 16);
+            }
+            return string;
+        }
+
         public void resetScore() {
             if(scoreAtual != null) {
-                scoreboard.resetScores(scoreAtual.getPlayer());
+                scoreboard.resetScores(scoreAtual.getEntry());
                 scoreAtual = null;
             }
         }

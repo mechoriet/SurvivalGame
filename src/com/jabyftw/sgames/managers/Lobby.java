@@ -45,7 +45,8 @@ public class Lobby {
     private State state = State.DISABLED;
     private boolean imortal, worth, stuck;
     private int duration;
-    private BukkitTask durationRunnable, deathmatchRunnable, chestRunnable, lightningRunnable, waitingRunnable;
+    private BukkitTask durationRunnable, deathmatchRunnable, chestRunnable, lightningRunnable, waitingRunnable,
+            pregameToGame = null, imortalityTask = null, deathmatchStart = null;
 
     public Lobby(SurvivalGames pl, String path, String name, String description, List<String> lore, List<String> commands,
                  int min, int max, int matchduration, int deathmatchduration, int distancefromcenter, int alivelightning, int chestdelay, int gracetime, int waittime,
@@ -92,45 +93,49 @@ public class Lobby {
     }
 
     public void startMatch() {
-        if(state == State.WAITING && preplayers.size() >= 2) {
-            state = State.PREGAME;
-            stuck = true;
-            endWaitingRunnable();
-            arenaManager.removeEntities();
-            prepareAllPlayers();
-            updatePlayersScoreboards();
-            broadcastMessage(pl.getLang("startedInXSeconds").replaceAll("%time", Integer.toString(waitTime)));
-            setBar(players.keySet(), pl.getLang("barapi.startingInXSeconds"), waitTime);
-            new BukkitRunnable() {
+        if(state == State.WAITING) {
+            if(!pl.config.require2Players || preplayers.size() >= 2) {
+                state = State.PREGAME;
+                stuck = true;
+                endWaitingRunnable();
+                arenaManager.removeEntities();
+                prepareAllPlayers();
+                updatePlayersScoreboards();
+                broadcastMessage(pl.getLang("startedInXSeconds").replaceAll("%time", Integer.toString(waitTime)));
+                setBar(players.keySet(), pl.getNoPrefixLang("barapi.startingInXSeconds"), waitTime);
+                pregameToGame = new BukkitRunnable() {
 
-                @Override
-                public void run() {
-                    state = State.PLAYING;
-                    updatePlayerList();
-                    startDurationRunnable();
-                    startChestRunnable();
-                    startLightningRunnable();
-                    startAllPlayers();
-                    updatePlayersScoreboards();
-                    stuck = false;
-                    broadcastMessage(pl.getLang("gameStarted"));
-                    worth = getAliveJogador().size() >= minPlayers;
-                    if(!worth) {
-                        broadcastMessage(pl.getLang("gameIsntWorth"));
-                    }
-                    broadcastMessage(pl.getLang("immortalityInXSeconds").replaceAll("%time", Integer.toString(graceTime)));
-                    setBar(players.keySet(), pl.getLang("barapi.immortalityOverInXSeconds"), graceTime);
-                    new BukkitRunnable() {
-
-                        @Override
-                        public void run() {
-                            imortal = false;
-                            broadcastMessage(pl.getLang("immortalityIsOver"));
-                            removeAllBar(players.keySet());
+                    @Override
+                    public void run() {
+                        state = State.PLAYING;
+                        updatePlayerList();
+                        startDurationRunnable();
+                        startChestRunnable();
+                        startLightningRunnable();
+                        startAllPlayers();
+                        updatePlayersScoreboards();
+                        stuck = false;
+                        broadcastMessage(pl.getLang("gameStarted"));
+                        worth = getAliveJogador().size() >= minPlayers;
+                        if(!worth) {
+                            broadcastMessage(pl.getLang("gameIsntWorth"));
                         }
-                    }.runTaskLater(pl, graceTime * 20);
-                }
-            }.runTaskLater(pl, waitTime * 20);
+                        broadcastMessage(pl.getLang("immortalityInXSeconds").replaceAll("%time", Integer.toString(graceTime)));
+                        setBar(players.keySet(), pl.getNoPrefixLang("barapi.immortalityOverInXSeconds"), graceTime);
+                        pregameToGame = null;
+                        imortalityTask = new BukkitRunnable() {
+
+                            @Override
+                            public void run() {
+                                imortal = false;
+                                broadcastMessage(pl.getLang("immortalityIsOver"));
+                                removeAllBar(players.keySet());
+                                imortalityTask = null;
+                            }
+                        }.runTaskLater(pl, graceTime * 20);
+                    }
+                }.runTaskLater(pl, waitTime * 20);
+            }
         }
     }
 
@@ -158,9 +163,9 @@ public class Lobby {
             endLightningRunnable();
             imortal = true;
             stuck = true;
-            setBar(players.keySet(), pl.getLang("barapi.deathmatchStartingInX"), 30);
+            setBar(players.keySet(), pl.getNoPrefixLang("barapi.deathmatchStartingInX"), 30);
             broadcastMessage(pl.getLang("deathmatchIn30Seconds"));
-            new BukkitRunnable() {
+            deathmatchStart = new BukkitRunnable() {
 
                 @Override
                 public void run() {
@@ -170,12 +175,16 @@ public class Lobby {
                     imortal = false;
                     broadcastMessage(pl.getLang("deathmatchStarted"));
                     removeAllBar(players.keySet());
+                    deathmatchStart = null;
                 }
             }.runTaskLater(pl, 20 * 30);
         }
     }
 
     public void endMatch(boolean stopping, boolean hasWinner) {
+        stopDeathmatchTask();
+        stopPreGameToGameTask();
+        stopImmortalityTask();
         if(state.equals(State.PLAYING) || state.equals(State.DEATHMATCH)) {
             state = State.DISABLED;
             arenaManager.removeEntities();
@@ -219,6 +228,27 @@ public class Lobby {
         }
     }
 
+    private void stopImmortalityTask() {
+        if(imortalityTask != null) {
+            imortalityTask.cancel();
+            imortalityTask = null;
+        }
+    }
+
+    private void stopPreGameToGameTask() {
+        if(pregameToGame != null) {
+            pregameToGame.cancel();
+            pregameToGame = null;
+        }
+    }
+
+    private void stopDeathmatchTask() {
+        if(deathmatchStart != null) {
+            deathmatchStart.cancel();
+            deathmatchStart = null;
+        }
+    }
+
     public boolean getImortality() {
         return imortal;
     }
@@ -239,7 +269,7 @@ public class Lobby {
         if(state == State.PLAYING || state == State.DEATHMATCH) {
             return Integer.toString(duration);
         } else {
-            return pl.getLang("command.durationDidntStarted");
+            return pl.getNoPrefixLang("command.durationDidntStarted");
         }
     }
 
@@ -291,7 +321,7 @@ public class Lobby {
                         }
                     }
                     if(duration == 1) {
-                        setBar(players.keySet(), pl.getLang("barapi.gameEndingIn1Minute"), 60);
+                        setBar(players.keySet(), pl.getNoPrefixLang("barapi.gameEndingIn1Minute"), 60);
                     }
                     if(duration <= 0) {
                         endMatch(false, false);
@@ -303,7 +333,7 @@ public class Lobby {
 
     public void startLightningRunnable() {
         if(aliveSizeToLightning > 0) {
-            new BukkitRunnable() {
+            lightningRunnable = new BukkitRunnable() {
 
                 @Override
                 public void run() {
@@ -373,7 +403,7 @@ public class Lobby {
                             if(warnedMaior >= possibleJoinWarnedMaior) {
                                 startMatch();
                             } else {
-                                setBar(preplayers.keySet(), pl.getLang("barapi.waitingPossibleJoins"), possibleJoinsDelay);
+                                setBar(preplayers.keySet(), pl.getNoPrefixLang("barapi.waitingPossibleJoins"), possibleJoinsDelay);
                                 broadcastMessage(pl.getLang("waitingPossibleJoins").replaceAll("%tries", Integer.toString(warnedMaior + 1)).replaceAll("%maxtries", Integer.toString(possibleJoinWarnedMaior)));
                                 warnedMaior++;
                             }
@@ -383,15 +413,15 @@ public class Lobby {
                     } else {
                         warnedMaior = 0;
                         if(warnedMenor >= possibleJoinWarnedMenor) {
-                            if(preplayers.size() >= 2) {
+                            if(!pl.config.require2Players || preplayers.size() >= 2) {
                                 startMatch();
                             } else {
                                 warnedMenor = 0;
                                 broadcastMessage(pl.getLang("youNeedATLEAST2People"));
-                                setBar(preplayers.keySet(), pl.getLang("barapi.tryingAgain"), possibleJoinsDelay);
+                                setBar(preplayers.keySet(), pl.getNoPrefixLang("barapi.tryingAgain"), possibleJoinsDelay);
                             }
                         } else {
-                            setBar(preplayers.keySet(), pl.getLang("barapi.waitingPossibleJoins"), possibleJoinsDelay);
+                            setBar(preplayers.keySet(), pl.getNoPrefixLang("barapi.waitingPossibleJoins"), possibleJoinsDelay);
                             broadcastMessage(pl.getLang("notEnoughPlayers").replaceAll("%needed", Integer.toString(minPlayers - preplayers.size())).replaceAll("%tries", Integer.toString(possibleJoinWarnedMenor - warnedMenor + 1)));
                             broadcastMessage(pl.getLang("gameWontBeWorth"));
                             warnedMenor++;
@@ -464,7 +494,7 @@ public class Lobby {
             jog.setPlaying(true);
             players.put(set.getKey(), jog);
             set.getKey().teleport(arenaManager.getSpawnLocation());
-            pl.cleanPlayer(set.getKey(), false, false);
+            pl.cleanPlayer(set.getKey(), false);
             equipWithKitItems(set.getKey(), set.getValue());
         }
         removeAllBar(preplayers.keySet());
@@ -522,9 +552,7 @@ public class Lobby {
     }
 
     public void removePlayer(Player p, boolean checkwin) {
-        if(pl.players.containsKey(p) && pl.players.get(p).equals(this)) {
-            pl.players.remove(p);
-        }
+        pl.players.remove(p);
         if(players.containsKey(p)) {
             Jogador j = players.get(p);
             j.getScoreboardManager().stopRunnable(true);
@@ -537,16 +565,13 @@ public class Lobby {
                     j.getRanking().addDeathToCounter();
                 }
             }
-            pl.cleanPlayer(p, false, true);
+            pl.cleanPlayer(p, false);
             players.remove(p);
-            if(checkwin) {
-                checkWin();
-            }
             updatePlayerList();
             pl.makeVisible(p);
         } else if(spectators.containsKey(p)) {
             pl.makeVisible(p);
-            pl.cleanPlayer(p, false, true);
+            pl.cleanPlayer(p, false);
             spectators.remove(p);
         }
         sponsors.remove(p);
@@ -556,6 +581,9 @@ public class Lobby {
         pl.config.prejoin.remove(p.getName());
         removeAllBar(Arrays.asList(p));
         p.teleport(arenaManager.getExitLocation());
+        if(checkwin) {
+            checkWin();
+        }
     }
 
     private void equipWithKitItems(Player player, Kit kit) {
@@ -886,7 +914,7 @@ public class Lobby {
     }
 
     public void setSpectator(Player player) {
-        pl.cleanPlayer(player, true, true);
+        pl.cleanPlayer(player, true);
         for(ItemStack is : pl.config.spectatorInventory) {
             player.getInventory().addItem(is);
         }
@@ -924,7 +952,7 @@ public class Lobby {
         }
         jogador.setPlaying(true);
         jogador.setAlreadyMuttated(true);
-        pl.cleanPlayer(jogador.getPlayer(), false, false);
+        pl.cleanPlayer(jogador.getPlayer(), false);
         pl.makeVisible(jogador.getPlayer());
         equipWithKitItems(jogador.getPlayer(), pl.config.muttationKit);
         jogador.getPlayer().teleport(arenaManager.getSpawnLocation());

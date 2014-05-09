@@ -52,6 +52,11 @@ public class Jogador extends Spectator {
 
     public void setPlaying(boolean isPlaying) {
         this.isPlaying = isPlaying;
+        if(isPlaying) {
+            scoreboardManager.startRunnable();
+        } else {
+            scoreboardManager.stopRunnable(true);
+        }
     }
 
     public String getKiller() {

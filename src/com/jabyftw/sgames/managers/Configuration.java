@@ -61,7 +61,7 @@ public final class Configuration {
     public Material spectatorPlayerSelector, spectatorPlayerSponsor, spectatorMuttation, playerSearcher, playerCrate;
 
     public boolean useVault, usePlayerPoints, useMySQL, useVoting, useAutojoin, useSponsor, tntAutoIgnite, useMuttation, tntUseFakeExplosion, useChat, announceCrateDeploy, playCrateFirework, blockDropItem,
-            useBarAPI;
+            useBarAPI, require2Players;
     public String waitingString, pregameString, playingString, deathmatchString, disabledString, chatFormat, crateAnnouncement, crateInventoryTitle, langPrefix;
     public int valuePerWin, valuePerKill, guiUpdateDelay, tntPower, tntDelay, maxDistance, signDelay, rankingEntries, muttationCost, muttationBonus, muttationReward, scoreboardDelay;
     public String[] signLines = new String[4];
@@ -133,6 +133,7 @@ public final class Configuration {
         config.addDefault("config.ingame.spectatorPlayerSponsorItem", "gold_ingot");
         config.addDefault("config.ingame.spectatorMuttationItem", "gold_sword");
         config.addDefault("config.ingame.dropItemsOnBlocKBreak", false);
+        config.addDefault("config.ingame.require2PlayersToStart", true);
         config.addDefault("config.ingame.changeChatFormat", true);
         config.addDefault("config.ingame.usedChatFormat", "&a[%points] &6%displayname&c:&f %message");
         config.addDefault("config.ingame.defaultAllowedCommands", Arrays.asList(commands));
@@ -445,6 +446,7 @@ public final class Configuration {
         spectatorMuttation = Material.valueOf(config.getString("config.ingame.spectatorMuttationItem").toUpperCase());
         playerSearcher = Material.valueOf(config.getString("config.ingane.playerSearcherItem").toUpperCase());
         playerCrate = Material.valueOf(config.getString("config.ingane.playerCrateItem").toUpperCase());
+        require2Players = config.getBoolean("config.ingame.require2PlayersToStart");
         useChat = config.getBoolean("config.ingame.changeChatFormat");
         chatFormat = config.getString("config.ingame.usedChatFormat").replaceAll("&", "§");
         blockDropItem = config.getBoolean("config.ingame.dropItemsOnBlocKBreak");
@@ -1574,11 +1576,11 @@ public final class Configuration {
         FileConfiguration scoreboards = scoreboardY.getConfig();
         String[] waiting = {"&6Players: &a%alive/%min", "blank", "&cMax duration: &4%maxdurationm", "blank", "&4K/D: &c%kdratio", "&4W/L: &c%wlratio", "&aPoints: &e%points"},
                 pregame = {"&6Players: &a%alive/%max", "blank", "&cKit: &6%kitname", "blank", "&4K/D: &c%kdratio", "&4W/L: &c%wlratio", "&aPoints: &e%points"},
-                playing = {"&6Players: &a%alive/%max", "blank", "&cKit: &6%kitname", "blank", "&4K/D: &c%kdratio", "&4W/L: &c%wlratio", "&aPoints: &e%points", "&cIs alive? &a%isalive"},
-                deathmatch = {"&4K/D: &c%kdratio", "&4W/L: &c%wlratio", "&aPoints: &e%points", "&cIs alive? &a%isalive"};
+                playing = {"&6Players: &a%alive/%max", "blank", "&cKit: &6%kitname", "blank", "&4K/D: &c%kdratio", "&4W/L: &c%wlratio", "&aPoints: &e%points", "&cAlive? &a%isalive"},
+                deathmatch = {"&4K/D: &c%kdratio", "&4W/L: &c%wlratio", "&aPoints: &e%points", "&cAlive? &a%isalive"};
         scoreboards.addDefault("scoreboards." + State.WAITING.toString().toLowerCase() + ".title", "&cWaiting...");
         scoreboards.addDefault("scoreboards." + State.WAITING.toString().toLowerCase() + ".lines", Arrays.asList(waiting));
-        scoreboards.addDefault("scoreboards." + State.PREGAME.toString().toLowerCase() + ".title", "&cWait %waiting sec");
+        scoreboards.addDefault("scoreboards." + State.PREGAME.toString().toLowerCase() + ".title", "&cSurvivalGames");
         scoreboards.addDefault("scoreboards." + State.PREGAME.toString().toLowerCase() + ".lines", Arrays.asList(pregame));
         scoreboards.addDefault("scoreboards." + State.PLAYING.toString().toLowerCase() + ".title", "&c%duration min");
         scoreboards.addDefault("scoreboards." + State.PLAYING.toString().toLowerCase() + ".lines", Arrays.asList(playing));
@@ -1593,7 +1595,10 @@ public final class Configuration {
         return new ScoreboardManager.Replacer() {
             @Override
             public String replaceString(String message) {
-                return message
+                if(message == null || message.length() <= 0) {
+                    return "invalid messaage";
+                }
+                message = message
                         .replaceAll("%isalive", Boolean.valueOf(jogador.isPlaying()).toString().toLowerCase())
                         .replaceAll("%kitname", jogador.getKit().getName())
                         .replaceAll("%kdratio", jogador.getRanking().getKillDeathRatio())
@@ -1606,12 +1611,14 @@ public final class Configuration {
                         .replaceAll("%min", Integer.toString(lobby.getMinPlayers()))
                         .replaceAll("%waiting", Integer.toString(lobby.getWaitTime()))
                         .replaceAll("&", "§");
+                return message;
             }
         };
     }
 
     public String getScoreboardTitle(State state) {
-        return scoreboardY.getConfig().getString("scoreboards." + state.toString().toLowerCase() + ".title");
+        String title = scoreboardY.getConfig().getString("scoreboards." + state.toString().toLowerCase() + ".title");
+        return title;
     }
 
     public String[] getScoreboardLines(State state) {
