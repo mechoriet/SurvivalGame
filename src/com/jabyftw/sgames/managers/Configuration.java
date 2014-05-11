@@ -1575,7 +1575,7 @@ public final class Configuration {
     private void generateScoreboardConfig() {
         FileConfiguration scoreboards = scoreboardY.getConfig();
         String[] waiting = {"&6Players: &a%alive/%min", "blank", "&cMax duration: &4%maxdurationm", "blank", "&4K/D: &c%kdratio", "&4W/L: &c%wlratio", "&aPoints: &e%points"},
-                pregame = {"&6Players: &a%alive/%max", "blank", "&cKit: &6%kitname", "blank", "&4K/D: &c%kdratio", "&4W/L: &c%wlratio", "&aPoints: &e%points"},
+                pregame = {"&6Players: &a%alive/%max", "blank", "&cKit: &6%kitname", "blank", "&4K/D: &c%kdratio", "&4W/L: &c%wlratio", "&aPoints: &e%points", "&cArena: &6%displayname"},
                 playing = {"&6Players: &a%alive/%max", "blank", "&cKit: &6%kitname", "blank", "&4K/D: &c%kdratio", "&4W/L: &c%wlratio", "&aPoints: &e%points", "&cAlive? &a%isalive"},
                 deathmatch = {"&4K/D: &c%kdratio", "&4W/L: &c%wlratio", "&aPoints: &e%points", "&cAlive? &a%isalive"};
         scoreboards.addDefault("scoreboards." + State.WAITING.toString().toLowerCase() + ".title", "&cWaiting...");
@@ -1610,6 +1610,7 @@ public final class Configuration {
                         .replaceAll("%max", Integer.toString(lobby.getMaxPlayers()))
                         .replaceAll("%min", Integer.toString(lobby.getMinPlayers()))
                         .replaceAll("%waiting", Integer.toString(lobby.getWaitTime()))
+                        .replaceAll("%displayname", lobby.getName())
                         .replaceAll("&", "§");
                 return message;
             }
