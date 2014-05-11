@@ -838,7 +838,20 @@ public final class Configuration {
                     }
                 } else if(property[0].equalsIgnoreCase("unsafeEnchantment")) {
                     String[] enchantmentProperty = property[1].split(";");
-                    Enchantment en = Enchantment.getByName(enchantmentProperty[0].toUpperCase());
+                    Enchantment en = null;
+                    if(enchantmentProperty[0].equalsIgnoreCase("random")) {
+                        int random = (int) pl.getRandom(0, Enchantment.values().length);
+                        int count = 0;
+                        for(Enchantment enchantment : Enchantment.values()) {
+                            if(random == count) {
+                                en = enchantment;
+                                break;
+                            }
+                            count++;
+                        }
+                    } else {
+                        en = Enchantment.getByName(enchantmentProperty[0].toUpperCase());
+                    }
                     if(en != null) {
                         unsafeenchantments.put(en, Integer.parseInt(enchantmentProperty[1]));
                     } else {
