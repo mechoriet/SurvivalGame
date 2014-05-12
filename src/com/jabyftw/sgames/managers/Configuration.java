@@ -233,7 +233,7 @@ public final class Configuration {
         lang.addDefault("lang.command.sgmHelp", "&cUsage: &6/sgm stop/start (id/name) &cor &6/sgm stop/start &cwhen on a match.");
         lang.addDefault("lang.command.votingHelp", "&cUsage: &6/sg vote (id/name)&c. You can find the ID using &6/sg list&c.");
         lang.addDefault("lang.command.voted", "&6You voted for the map.");
-        lang.addDefault("lang.command.cantVoteAgain", "&6You can't vote again.");
+        lang.addDefault("lang.command.cantVoteAgainOrInvalidMap", "&6You can't vote again or invalid map name.");
         lang.addDefault("lang.command.kickHelp", "&cUsage: &6/sgm kick (player name)");
         lang.addDefault("lang.command.playerIsntPlaying", "&cPlayer isnt playing.");
         lang.addDefault("lang.command.playerKicked", "&cPlayer kicked.");
@@ -748,19 +748,27 @@ public final class Configuration {
     }
 
     private boolean setupVault() {
-        RegisteredServiceProvider<Economy> economyProvider = pl.getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-        RegisteredServiceProvider<Permission> permissionProvider = pl.getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
-        if(economyProvider != null && permissionProvider != null) {
-            econ = economyProvider.getProvider();
-            perm = permissionProvider.getProvider();
+        try {
+            RegisteredServiceProvider<Economy> economyProvider = pl.getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+            RegisteredServiceProvider<Permission> permissionProvider = pl.getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+            if(economyProvider != null && permissionProvider != null) {
+                econ = economyProvider.getProvider();
+                perm = permissionProvider.getProvider();
+            }
+            return (perm != null) && (econ != null);
+        } catch(NoClassDefFoundError ignored) {
         }
-        return (perm != null) && (econ != null);
+        return false;
     }
 
     private boolean setupPlayerPoints() {
-        final Plugin plugin = pl.getServer().getPluginManager().getPlugin("PlayerPoints");
-        playerp = PlayerPoints.class.cast(plugin);
-        return playerp != null;
+        try {
+            final Plugin plugin = pl.getServer().getPluginManager().getPlugin("PlayerPoints");
+            playerp = PlayerPoints.class.cast(plugin);
+            return playerp != null;
+        } catch(NoClassDefFoundError ignored) {
+        }
+        return false;
     }
 
     public Location resolveLocation(String loc) {

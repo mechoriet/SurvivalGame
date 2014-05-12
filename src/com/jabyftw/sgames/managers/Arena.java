@@ -160,6 +160,8 @@ public class Arena {
 
     private void searchChunks() {
         if(corner1.getWorld() != null && corner2.getWorld() != null && corner1.getWorld().equals(corner2.getWorld())) {
+            corner1.getChunk().load();
+            corner2.getChunk().load();
             for(int x = Math.min(corner1.getChunk().getX(), corner2.getChunk().getX()); x <= Math.max(corner1.getChunk().getX(), corner2.getChunk().getX()); x++) {
                 for(int z = Math.min(corner1.getChunk().getZ(), corner2.getChunk().getZ()); z <= Math.max(corner1.getChunk().getZ(), corner2.getChunk().getZ()); z++) {
                     Chunk c = corner1.getWorld().getChunkAt(x, z);

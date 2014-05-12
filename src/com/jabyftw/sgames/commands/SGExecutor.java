@@ -182,7 +182,7 @@ public class SGExecutor implements CommandExecutor {
                                     sender.sendMessage(pl.getLang("command.voted"));
                                     return true;
                                 } else {
-                                    sender.sendMessage(pl.getLang("command.cantVoteAgain"));
+                                    sender.sendMessage(pl.getLang("command.cantVoteAgainOrInvalidMap"));
                                     return true;
                                 }
                             } else {
