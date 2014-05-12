@@ -265,6 +265,10 @@ public class Lobby {
         return minPlayers;
     }
 
+    public int getRawDuration() {
+        return duration;
+    }
+
     public String getDurationRemaining() {
         if(state == State.PLAYING || state == State.DEATHMATCH) {
             return Integer.toString(duration);

@@ -159,18 +159,23 @@ public class Arena {
     }
 
     private void searchChunks() {
-        for(int x = Math.min(corner1.getChunk().getX(), corner2.getChunk().getX()); x <= Math.max(corner1.getChunk().getX(), corner2.getChunk().getX()); x++) {
-            for(int z = Math.min(corner1.getChunk().getZ(), corner2.getChunk().getZ()); z <= Math.max(corner1.getChunk().getZ(), corner2.getChunk().getZ()); z++) {
-                Chunk c = corner1.getWorld().getChunkAt(x, z);
-                lobbyChunks.add(c);
-                if(searchForChests) {
-                    for(BlockState bs : c.getTileEntities()) {
-                        if(isAChest(bs)) {
-                            addChestLocation(bs.getLocation(), pl.config.defaultTier.getPath());
+        if(corner1.getWorld() != null && corner2.getWorld() != null && corner1.getWorld().equals(corner2.getWorld())) {
+            for(int x = Math.min(corner1.getChunk().getX(), corner2.getChunk().getX()); x <= Math.max(corner1.getChunk().getX(), corner2.getChunk().getX()); x++) {
+                for(int z = Math.min(corner1.getChunk().getZ(), corner2.getChunk().getZ()); z <= Math.max(corner1.getChunk().getZ(), corner2.getChunk().getZ()); z++) {
+                    Chunk c = corner1.getWorld().getChunkAt(x, z);
+                    lobbyChunks.add(c);
+                    if(searchForChests) {
+                        for(BlockState bs : c.getTileEntities()) {
+                            if(isAChest(bs)) {
+                                addChestLocation(bs.getLocation(), pl.config.defaultTier.getPath());
+                            }
                         }
                     }
                 }
             }
+        } else {
+            pl.getLogger().log(Level.WARNING, "Skipping chunk searching, world is null (not found) or first corner's world isn't the same as second corner's world");
+            pl.getLogger().log(Level.WARNING, "There WILL be errors and features not working properly.");
         }
     }
 

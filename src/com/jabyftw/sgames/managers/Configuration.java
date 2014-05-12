@@ -1623,6 +1623,7 @@ public final class Configuration {
                         .replaceAll("%max", Integer.toString(lobby.getMaxPlayers()))
                         .replaceAll("%min", Integer.toString(lobby.getMinPlayers()))
                         .replaceAll("%waiting", Integer.toString(lobby.getWaitTime()))
+                        .replaceAll("%timetodm", Integer.toString(lobby.getRawDuration() + lobby.getDeathmatchDuration()))
                         .replaceAll("%displayname", lobby.getName())
                         .replaceAll("&", "§");
                 return message;
