@@ -1631,7 +1631,7 @@ public final class Configuration {
                         .replaceAll("%max", Integer.toString(lobby.getMaxPlayers()))
                         .replaceAll("%min", Integer.toString(lobby.getMinPlayers()))
                         .replaceAll("%waiting", Integer.toString(lobby.getWaitTime()))
-                        .replaceAll("%timetodm", Integer.toString(lobby.getRawDuration() + lobby.getDeathmatchDuration()))
+                        .replaceAll("%timetodm", Integer.toString(lobby.getRawDuration() - lobby.getDeathmatchDuration()))
                         .replaceAll("%displayname", lobby.getName())
                         .replaceAll("&", "§");
                 return message;
@@ -1640,8 +1640,7 @@ public final class Configuration {
     }
 
     public String getScoreboardTitle(State state) {
-        String title = scoreboardY.getConfig().getString("scoreboards." + state.toString().toLowerCase() + ".title");
-        return title;
+        return scoreboardY.getConfig().getString("scoreboards." + state.toString().toLowerCase() + ".title");
     }
 
     public String[] getScoreboardLines(State state) {
