@@ -135,6 +135,8 @@ public class Arena {
         if(allowBreak.contains(mat) || p.hasPermission(pl.permissions.operator_breakall)) {
             if(changedBlocks.containsKey(loc)) {
                 changedBlocks.put(loc, changedBlocks.remove(loc));
+            } else {
+                changedBlocks.put(loc, mat);
             }
             return true;
         }
@@ -145,6 +147,8 @@ public class Arena {
         if(allowPlace.contains(mat) || p.hasPermission(pl.permissions.operator_placeall)) {
             if(changedBlocks.containsKey(loc)) {
                 changedBlocks.put(loc, changedBlocks.remove(loc));
+            } else {
+                changedBlocks.put(loc, mat);
             }
             return true;
         }
