@@ -573,7 +573,8 @@ public class Lobby {
             players.remove(p);
             updatePlayerList();
             pl.makeVisible(p);
-        } else if(spectators.containsKey(p)) {
+        }
+        if(spectators.containsKey(p)) {
             pl.makeVisible(p);
             pl.cleanPlayer(p, false);
             spectators.remove(p);
